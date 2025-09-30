@@ -226,6 +226,10 @@ classForm.addEventListener("submit", async (e) => {
   const description = document.getElementById("classDescription").value;
   const recipe = document.getElementById("classRecipe").value;
   const whatCooking = document.getElementById("whatCooking").value;
+
+  const eventbriteLink = document.getElementById("eventbriteLink").value;
+  const SecondLink = document.getElementById("SecondLink").value;
+
   const visible = document.getElementById("classVisible").checked;
 
   const singlesCost = parseFloat(document.getElementById("singlesCost").value) || 0;
@@ -255,6 +259,8 @@ classForm.addEventListener("submit", async (e) => {
     spotsAvailable: spots,
     vibe,
     coverImage,
+    secondLink,
+    eventbriteLink,
     dateTimes
   };
 
@@ -288,6 +294,9 @@ async function editClass(id) {
       document.getElementById("classRecipe").value = cls.recipe || "";
       document.getElementById("whatCooking").value = cls.whatCooking || "";
       document.getElementById("classVisible").checked = cls.visible;
+
+      document.getElementById("eventbriteLink").value = cls.eventbriteLink || "";
+      document.getElementById("secondLink").value = cls.secondLink || "";
 
       document.getElementById("singlesCost").value = cls.singlesCost || 0;
       document.getElementById("couplesCost").value = cls.couplesCost || 0;
