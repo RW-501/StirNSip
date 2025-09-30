@@ -35,7 +35,7 @@ async function loadSiteSettings() {
 
       // Hero / About / Contact
       heroImage.src = data.heroImage || "";
-      aboutText.textContent = data.about || "";
+      aboutText.innerHTML  = data.about || "";
 
       // Load FAQ
       renderFAQ(data.faq || []);
