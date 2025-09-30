@@ -3,37 +3,59 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Class Details | Stir & Sip</title>
+  <title>Stir N Sip | Home</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <!-- HEADER -->
   <header class="sticky-header">
     <nav class="nav-container">
-      <a href="/index.html" class="logo">Stir & Sip</a>
+      <a href="/index.html" class="logo">Stir N Sip</a>
     </nav>
+    <!-- Hero Image -->
+    <div id="heroSection">
+      <img id="heroImage" src="" alt="Hero" style="width:100%; max-height:400px; object-fit:cover;">
+    </div>
   </header>
 
-  <!-- CLASS DETAILS -->
-  <section id="class-detail" class="class-detail">
-    <h1 id="className">Loading...</h1>
-    <p id="classDate"></p>
-    <p id="classTime"></p>
-    <p id="classDescription"></p>
+  <!-- ABOUT SECTION -->
+  <section id="aboutSection" class="about-section">
+    <h2>About Us</h2>
+    <p id="aboutText">Loading about info...</p>
+  </section>
 
-    <!-- Recipe Section (Future-ready) -->
-    <div id="recipe-section" class="recipe-section">
-      <h2>Recipe & Extras</h2>
-      <div id="recipeContent">
-        <p>Recipes and extras will appear here for this class.</p>
-      </div>
-    </div>
+  <!-- CLASSES LIST -->
+  <section id="classesSection">
+    <h2>Upcoming Classes</h2>
+    <div id="classes-list"></div>
+  </section>
+
+  <!-- SITE INFO -->
+  <section id="infoSection">
+    <h2>Class Info & Vibe</h2>
+    <p><strong>Cost:</strong> $<span id="classCost"></span></p>
+    <p><strong>Class Size:</strong> <span id="classSize"></span></p>
+    <p><strong>Spots Available:</strong> <span id="spotsAvailable"></span></p>
+    <p><strong>Vibe:</strong> <span id="classVibe"></span></p>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faqSection">
+    <h2>FAQ</h2>
+    <p id="faqText">Loading FAQs...</p>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contactSection">
+    <h2>Contact Us</h2>
+    <p id="contactInfo">Loading contact info...</p>
   </section>
 
   <!-- FOOTER -->
   <footer>
-    <p>&copy; 2025 Stir & Sip</p>
+    <p>&copy; <span id="year"></span> Stir N Sip</p>
   </footer>
+
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>

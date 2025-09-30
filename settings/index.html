@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings | Stir & Sip Admin</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="nav-brand"><a href="index.html" class="home">Stir & Sip Admin</a></div>
+    <ul class="nav-links">
+      <li><a href="admin.html">Dashboard</a></li>
+      <li><a href="settings.html" class="active">Settings</a></li>
+      <li><a href="logout.html">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h1>Site Settings</h1>
+
+    <section id="site-settings">
+      <!-- Hero Image -->
+      <label for="heroImage">Hero Image:</label>
+      <input type="file" id="heroImage" accept="image/*" />
+      <img id="heroPreview" src="" alt="Hero Preview" style="max-width:300px; display:block; margin:0.5rem 0;" />
+
+      <!-- About Section -->
+      <label for="aboutText">About Section:</label>
+      <textarea id="aboutText" placeholder="Write about your brand..." rows="4"></textarea>
+
+      <!-- Classes Info -->
+      <label for="classCost">Class Cost ($):</label>
+      <input type="number" id="classCost" min="0" step="0.01" />
+
+      <label for="classSize">Class Size:</label>
+      <input type="number" id="classSize" min="1" />
+
+      <label for="spotsAvailable">Spots Available:</label>
+      <input type="number" id="spotsAvailable" min="0" />
+
+      <!-- Vibe -->
+      <label for="classVibe">Vibe:</label>
+      <select id="classVibe">
+        <option value="">-- Select Vibe --</option>
+        <option value="hip hop">Hip Hop</option>
+        <option value="hype">Hype</option>
+        <option value="old skool">Old Skool</option>
+      </select>
+
+      <!-- FAQ -->
+      <label for="faqText">FAQ:</label>
+      <textarea id="faqText" placeholder="List FAQs..." rows="4"></textarea>
+
+      <!-- Contact Info -->
+      <label for="contactInfo">Contact Info (Email / Phone):</label>
+      <textarea id="contactInfo" placeholder="Enter contact details..." rows="2"></textarea>
+
+      <button id="saveSettings">Save Settings</button>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>&copy; <span id="year"></span> Stir & Sip. Admin Panel.</p>
+  </footer>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
+      authDomain: "stirnsip-978dc.firebaseapp.com",
+      projectId: "stirnsip-978dc",
+      storageBucket: "stirnsip-978dc.firebasestorage.app",
+      messagingSenderId: "727033774529",
+      appId: "1:727033774529:web:b2d103f6231bec75916f40",
+      measurementId: "G-E72374YTPE",
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // DOM
+    const heroImageInput = document.getElementById("heroImage");
+    const heroPreview = document.getElementById("heroPreview");
+    const aboutText = document.getElementById("aboutText");
+    const classCost = document.getElementById("classCost");
+    const classSize = document.getElementById("classSize");
+    const spotsAvailable = document.getElementById("spotsAvailable");
+    const classVibe = document.getElementById("classVibe");
+    const faqText = document.getElementById("faqText");
+    const contactInfo = document.getElementById("contactInfo");
+    const saveSettingsBtn = document.getElementById("saveSettings");
+
+    // Load settings
+    async function loadSettings() {
+      try {
+        const settingsDoc = doc(db, "siteSettings", "main");
+        const docSnap = await getDoc(settingsDoc);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          heroPreview.src = data.heroImage || "";
+          aboutText.value = data.about || "";
+          classCost.value = data.classCost || "";
+          classSize.value = data.classSize || "";
+          spotsAvailable.value = data.spotsAvailable || "";
+          classVibe.value = data.vibe || "";
+          faqText.value = data.faq || "";
+          contactInfo.value = data.contact || "";
+        }
+      } catch(err) {
+        console.error("Error loading settings:", err);
+      }
+    }
+
+    // Upload hero image
+    async function uploadHeroImage(file) {
+      const fileName = `hero_${Date.now()}_${file.name}`;
+      const storageRef = ref(storage, `settings/${fileName}`);
+      await uploadBytes(storageRef, file);
+      return await getDownloadURL(storageRef);
+    }
+
+    // Save settings
+    saveSettingsBtn.addEventListener("click", async () => {
+      let heroUrl = heroPreview.src;
+
+      if (heroImageInput.files[0]) {
+        heroUrl = await uploadHeroImage(heroImageInput.files[0]);
+        heroPreview.src = heroUrl;
+      }
+
+      const settingsData = {
+        heroImage: heroUrl,
+        about: aboutText.value,
+        classCost: parseFloat(classCost.value) || 0,
+        classSize: parseInt(classSize.value) || 0,
+        spotsAvailable: parseInt(spotsAvailable.value) || 0,
+        vibe: classVibe.value,
+        faq: faqText.value,
+        contact: contactInfo.value,
+        updatedAt: new Date()
+      };
+
+      try {
+        const settingsDoc = doc(db, "siteSettings", "main");
+        await updateDoc(settingsDoc, settingsData).catch(async () => {
+          await setDoc(settingsDoc, settingsData);
+        });
+        alert("Settings saved!");
+      } catch(err) {
+        console.error("Error saving settings:", err);
+      }
+    });
+
+    // Initial load
+    loadSettings();
+
+    // Auto-update year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
