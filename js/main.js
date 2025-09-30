@@ -18,6 +18,7 @@
 const heroImage = document.getElementById("heroImage");
 const aboutText = document.getElementById("aboutText");
 const contactInfoEl = document.getElementById("contactInfo");
+const classesList = document.getElementById("classesList");
 
 const faqListEl = document.getElementById("faqList");
 const faqSearch = document.getElementById("faqSearch");
