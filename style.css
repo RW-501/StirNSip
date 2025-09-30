@@ -5,7 +5,8 @@
   --color-terra: #E07A5F;
   --color-mustard: #F4D35E;
   --color-olive: #6A994E;
-  --color-cream: #FFF3E2;
+  --color-cream: #2c2c2c;
+  --color-font: #f0f0f0;
   --font-header: 'Pacifico', cursive;
   --font-body: 'Open Sans', sans-serif;
 }
@@ -29,7 +30,7 @@ body {
   font-family: var(--font-body);
   line-height: 1.6;
   background-color: var(--color-cream);
-  color: #333;
+  color: var(--color-font);
 }
 main {
 
@@ -63,7 +64,7 @@ main {
 
 .nav-links a {
   text-decoration: none;
-  color: #333;
+  color:  var(--color-font);
   transition: color 0.3s ease;
 }
 
@@ -81,7 +82,7 @@ main {
   justify-content: space-around;
   padding: 4rem 2rem;
   background: var(--color-mustard);
-  color: #333;
+  color: var(--color-font);
   text-align: center;
 }
 
