@@ -14,21 +14,51 @@
     </nav>
   </header>
 
-  <!-- CLASS DETAILS -->
-  <section id="class-detail" class="class-detail">
-    <h1 id="className">Loading...</h1>
+<!-- CLASS DETAILS -->
+<section id="class-detail" class="class-detail">
+  <h1 id="className">Loading...</h1>
+
+  <div class="class-meta">
     <p id="classDate"></p>
     <p id="classTime"></p>
-    <p id="classDescription"></p>
+    <p id="classVibe"></p>
+    <p id="classSize"></p>
+    <p id="spotsAvailable"></p>
+    <p id="singlesCost"></p>
+    <p id="couplesCost"></p>
+    <p id="whatCooking"></p>
+  </div>
 
-    <!-- Recipe Section (Future-ready) -->
-    <div id="recipe-section" class="recipe-section">
-      <h2>Recipe & Extras</h2>
-      <div id="recipeContent">
-        <p>Recipes and extras will appear here for this class.</p>
-      </div>
+  <div class="buy-buttons">
+    <a id="eventbriteBtn" href="#" target="_blank" class="cta-btn">Buy on Eventbrite</a>
+    <a id="otherBuyBtn" href="#" target="_blank" class="cta-btn">Buy Now</a>
+  </div>
+
+  <p id="classDescription"></p>
+
+  <!-- Recipe Section -->
+  <div id="recipe-section" class="recipe-section">
+    <h2>Recipe & Extras</h2>
+    <div id="recipeContent">
+      <p>Recipes and extras will appear here for this class.</p>
     </div>
-  </section>
+  </div>
+</section>
+
+<!-- UPCOMING CLASSES -->
+<section id="upcomingClasses" class="classes">
+  <h2>Upcoming Classes</h2>
+  <div id="classesList" class="class-grid"></div>
+</section>
+
+<!-- MERCH SECTION -->
+<section id="merchSection" class="merch">
+  <h2>Merch</h2>
+  <div id="merchList" class="merch-grid">
+    <!-- Merch items loaded dynamically -->
+  </div>
+</section>
+
 
   <!-- FOOTER -->
   <footer>
