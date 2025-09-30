@@ -70,40 +70,55 @@
 
   <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
 
-    // Firebase Config
-    const firebaseConfig = {
-      apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
-      authDomain: "stirnsip-978dc.firebaseapp.com",
-      projectId: "stirnsip-978dc",
-      storageBucket: "stirnsip-978dc.firebasestorage.app",
-      messagingSenderId: "727033774529",
-      appId: "1:727033774529:web:b2d103f6231bec75916f40",
-      measurementId: "G-E72374YTPE",
-    };
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
+  authDomain: "stirnsip-978dc.firebaseapp.com",
+  projectId: "stirnsip-978dc",
+  storageBucket: "stirnsip-978dc.firebasestorage.app",
+  messagingSenderId: "727033774529",
+  appId: "1:727033774529:web:b2d103f6231bec75916f40",
+  measurementId: "G-E72374YTPE",
+};
 
-    // Init Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
+// Init Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-    // DOM
-    const heroImageInput = document.getElementById("heroImage");
-    const heroPreview = document.getElementById("heroPreview");
-    const aboutText = document.getElementById("aboutText");
-    const classCost = document.getElementById("classCost");
-    const classSize = document.getElementById("classSize");
-    const spotsAvailable = document.getElementById("spotsAvailable");
-    const classVibe = document.getElementById("classVibe");
-    const faqText = document.getElementById("faqText");
-    const contactInfo = document.getElementById("contactInfo");
-    const saveSettingsBtn = document.getElementById("saveSettings");
-
+// DOM
+const heroImageInput = document.getElementById("heroImage");
+const heroPreview = document.getElementById("heroPreview");
+const aboutText = document.getElementById("aboutText");
+const classCost = document.getElementById("classCost");
+const classSize = document.getElementById("classSize");
+const spotsAvailable = document.getElementById("spotsAvailable");
+const classVibe = document.getElementById("classVibe");
+const contactInfo = document.getElementById("contactInfo");
+const saveSettingsBtn = document.getElementById("saveSettings");
 const faqContainer = document.getElementById("faqContainer");
 const addFaqBtn = document.getElementById("addFaqBtn");
+
+// Add FAQ row
+function addFaqItem(question = "", answer = "") {
+  const div = document.createElement("div");
+  div.classList.add("faq-item");
+  div.innerHTML = `
+    <input type="text" placeholder="Question" value="${question}" required />
+    <textarea placeholder="Answer" rows="2" required>${answer}</textarea>
+    <button type="button" class="removeFaqBtn">Remove</button>
+  `;
+  faqContainer.appendChild(div);
+
+  div.querySelector(".removeFaqBtn").addEventListener("click", () => div.remove());
+}
+
+// Add FAQ button
+addFaqBtn.addEventListener("click", () => addFaqItem());
 
 // Load settings
 async function loadSettings() {
@@ -120,7 +135,7 @@ async function loadSettings() {
       classVibe.value = data.vibe || "";
       contactInfo.value = data.contact || "";
 
-      // Load FAQs
+      // Load FAQs dynamically
       faqContainer.innerHTML = "";
       const faqs = data.faq || [];
       faqs.forEach(f => addFaqItem(f.question, f.answer));
@@ -130,53 +145,41 @@ async function loadSettings() {
   }
 }
 
-// Add a new FAQ row
-function addFaqItem(question = "", answer = "") {
-  const div = document.createElement("div");
-  div.classList.add("faq-item");
-  div.innerHTML = `
-    <input type="text" placeholder="Question" value="${question}" required />
-    <textarea placeholder="Answer" rows="2" required>${answer}</textarea>
-    <button type="button" class="removeFaqBtn">Remove</button>
-  `;
-  faqContainer.appendChild(div);
-
-  div.querySelector(".removeFaqBtn").addEventListener("click", () => {
-    div.remove();
-  });
+// Upload hero image
+async function uploadHeroImage(file) {
+  const fileName = `hero_${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, `settings/${fileName}`);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
 }
-
-// Add FAQ button
-addFaqBtn.addEventListener("click", () => addFaqItem());
 
 // Save settings
 saveSettingsBtn.addEventListener("click", async () => {
-  let heroUrl = heroPreview.src;
-
-  if (heroImageInput.files[0]) {
-    heroUrl = await uploadHeroImage(heroImageInput.files[0]);
-    heroPreview.src = heroUrl;
-  }
-
-  // Gather FAQ data
-  const faqs = Array.from(faqContainer.querySelectorAll(".faq-item")).map(item => ({
-    question: item.querySelector("input").value,
-    answer: item.querySelector("textarea").value
-  }));
-
-  const settingsData = {
-    heroImage: heroUrl,
-    about: aboutText.value,
-    classCost: parseFloat(classCost.value) || 0,
-    classSize: parseInt(classSize.value) || 0,
-    spotsAvailable: parseInt(spotsAvailable.value) || 0,
-    vibe: classVibe.value,
-    faq: faqs,
-    contact: contactInfo.value,
-    updatedAt: new Date()
-  };
-
   try {
+    let heroUrl = heroPreview.src;
+    if (heroImageInput.files[0]) {
+      heroUrl = await uploadHeroImage(heroImageInput.files[0]);
+      heroPreview.src = heroUrl;
+    }
+
+    // Gather FAQ data
+    const faqs = Array.from(faqContainer.querySelectorAll(".faq-item")).map(item => ({
+      question: item.querySelector("input").value,
+      answer: item.querySelector("textarea").value
+    }));
+
+    const settingsData = {
+      heroImage: heroUrl,
+      about: aboutText.value,
+      classCost: parseFloat(classCost.value) || 0,
+      classSize: parseInt(classSize.value) || 0,
+      spotsAvailable: parseInt(spotsAvailable.value) || 0,
+      vibe: classVibe.value,
+      faq: faqs,
+      contact: contactInfo.value,
+      updatedAt: new Date()
+    };
+
     const settingsDoc = doc(db, "siteSettings", "main");
     await updateDoc(settingsDoc, settingsData).catch(async () => {
       await setDoc(settingsDoc, settingsData);
@@ -187,52 +190,12 @@ saveSettingsBtn.addEventListener("click", async () => {
   }
 });
 
+// Initial load
+loadSettings();
 
-    // Upload hero image
-    async function uploadHeroImage(file) {
-      const fileName = `hero_${Date.now()}_${file.name}`;
-      const storageRef = ref(storage, `settings/${fileName}`);
-      await uploadBytes(storageRef, file);
-      return await getDownloadURL(storageRef);
-    }
+// Auto-update year
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
 
-    // Save settings
-    saveSettingsBtn.addEventListener("click", async () => {
-      let heroUrl = heroPreview.src;
-
-      if (heroImageInput.files[0]) {
-        heroUrl = await uploadHeroImage(heroImageInput.files[0]);
-        heroPreview.src = heroUrl;
-      }
-
-      const settingsData = {
-        heroImage: heroUrl,
-        about: aboutText.value,
-        classCost: parseFloat(classCost.value) || 0,
-        classSize: parseInt(classSize.value) || 0,
-        spotsAvailable: parseInt(spotsAvailable.value) || 0,
-        vibe: classVibe.value,
-        faq: faqText.value,
-        contact: contactInfo.value,
-        updatedAt: new Date()
-      };
-
-      try {
-        const settingsDoc = doc(db, "siteSettings", "main");
-        await updateDoc(settingsDoc, settingsData).catch(async () => {
-          await setDoc(settingsDoc, settingsData);
-        });
-        alert("Settings saved!");
-      } catch(err) {
-        console.error("Error saving settings:", err);
-      }
-    });
-
-    // Initial load
-    loadSettings();
-
-    // Auto-update year
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
 </body>
 </html>
