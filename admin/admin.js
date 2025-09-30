@@ -143,7 +143,6 @@ verifyCodeBtn.addEventListener("click", async () => {
 loginBtn.addEventListener("click", async () => {
   const email = loginEmail.value;
   const password = loginPassword.value;
-
   try {
     await signInWithEmailAndPassword(auth, email, password);
     loginError.textContent = "";
@@ -152,6 +151,7 @@ loginBtn.addEventListener("click", async () => {
     loginError.textContent = "Invalid email or password.";
   }
 });
+
 
 // -------------------- Classes --------------------
 async function loadCoverOptions(className) {

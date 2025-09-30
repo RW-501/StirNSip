@@ -1,3 +1,15 @@
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  onSnapshot,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
 export function makeGallerySortable() {
   let dragged;
   galleryList.querySelectorAll(".gallery-item").forEach(item => {
