@@ -10,31 +10,58 @@
   <!-- HEADER -->
   <header class="sticky-header">
     <nav class="nav-container">
-      <a href="/index.html" class="logo">Stir & Sip</a>
+      <a href="/index.html" class="logo">Stir N' Sip</a>
     </nav>
   </header>
 
 <!-- CLASS DETAILS -->
 <section id="class-detail" class="class-detail">
-  <h1 id="className">Loading...</h1>
+  <h1 id="className" class="class-title">Loading...</h1>
 
   <div class="class-meta">
-    <p id="classDate"></p>
-    <p id="classTime"></p>
-    <p id="classVibe"></p>
-    <p id="classSize"></p>
-    <p id="spotsAvailable"></p>
-    <p id="singlesCost"></p>
-    <p id="couplesCost"></p>
-    <p id="whatCooking"></p>
+    <div class="meta-item">
+      <span class="meta-label">Dates:</span>
+      <span id="classDate" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Times:</span>
+      <span id="classTime" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Vibe:</span>
+      <span id="classVibe" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Size:</span>
+      <span id="classSize" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Spots Available:</span>
+      <span id="spotsAvailable" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Singles Cost:</span>
+      <span id="singlesCost" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">Couples Cost:</span>
+      <span id="couplesCost" class="meta-value"></span>
+    </div>
+    <div class="meta-item">
+      <span class="meta-label">What We Cooking:</span>
+      <span id="whatCooking" class="meta-value"></span>
+    </div>
   </div>
 
   <div class="buy-buttons">
     <a id="eventbriteBtn" href="#" target="_blank" class="cta-btn">Buy on Eventbrite</a>
-    <a id="otherBuyBtn" href="#" target="_blank" class="cta-btn">Buy Now</a>
+    <a id="otherBuyBtn" href="#" target="_blank" class="cta-btn secondary-btn">Buy Now</a>
   </div>
 
-  <p id="classDescription"></p>
+  <div class="description">
+    <h2>Description</h2>
+    <p id="classDescription"></p>
+  </div>
 
   <!-- Recipe Section -->
   <div id="recipe-section" class="recipe-section">
@@ -44,6 +71,7 @@
     </div>
   </div>
 </section>
+
 
 <!-- UPCOMING CLASSES -->
 <section id="upcomingClasses" class="classes">
