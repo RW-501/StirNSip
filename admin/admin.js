@@ -272,17 +272,50 @@ function renderClasses(docs) {
 galleryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const file = document.getElementById("galleryImage").files[0];
-  const eventName = document.getElementById("galleryEvent").value;
+const files = document.getElementById("galleryImage").files;
+if (!files.length) return alert("Please select at least one image");
+
+
+
+// Auto-refresh cover options if a class is being edited
+const currentClassName = document.getElementById("className").value;
+if (currentClassName) loadCoverOptions(currentClassName);
+
+
+const eventName = document.getElementById("galleryEvent").value;
   const date = document.getElementById("galleryDate").value;
   const location = document.getElementById("galleryLocation").value;
   const group = document.getElementById("galleryGroup").value;
   const isCover = document.getElementById("galleryCover").checked;
 
-  if (!file) return alert("Please select an image");
 
+ for (let i = 0; i < files.length; i++) {
+  const file = files[i];
   const fileName = `${Date.now()}_${file.name}`;
   const storageRef = ref(storage, `gallery/${fileName}`);
+
+  try {
+    await uploadBytes(storageRef, file);
+    const imageUrl = await getDownloadURL(storageRef);
+
+    await addDoc(collection(db, "gallery"), {
+      eventName,
+      date,
+      location,
+      group,
+      cover: isCover && i === 0, // optional: mark first file as cover if checked
+      url: imageUrl,
+      visible: true, // added so you can hide/show later
+      createdAt: new Date()
+    });
+
+  } catch (err) {
+    console.error("Error uploading image: ", err);
+  }
+}
+
+alert(`${files.length} image(s) uploaded!`);
+galleryForm.reset();
 
   try {
     await uploadBytes(storageRef, file);
