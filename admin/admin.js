@@ -53,8 +53,8 @@ const verificationCodeInput = document.getElementById("verificationCode");
 const verifyCodeBtn = document.getElementById("verifyCodeBtn");
 
 // Allowed emails and phone numbers
-const allowedEmails = ["admin@example.com", "owner@stirnsip.com"];
-const allowedPhones = ["+15555555555", "+14445556666"];
+const allowedEmails = ["1988lrp@gmail.com", "owner@stirnsip.com"];
+const allowedPhones = ["+19725977878", "+14445556666"];
 
 // Show/hide sections based on login state
 onAuthStateChanged(auth, (user) => {
