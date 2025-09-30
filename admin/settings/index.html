@@ -49,24 +49,7 @@
       <label for="aboutText">About Section:</label>
       <textarea id="aboutText" placeholder="Write about your brand..." rows="4"></textarea>
 
-      <!-- Classes Info -->
-      <label for="classCost">Class Cost ($):</label>
-      <input type="number" id="classCost" min="0" step="0.01" />
 
-      <label for="classSize">Class Size:</label>
-      <input type="number" id="classSize" min="1" />
-
-      <label for="spotsAvailable">Spots Available:</label>
-      <input type="number" id="spotsAvailable" min="0" />
-
-      <!-- Vibe -->
-      <label for="classVibe">Vibe:</label>
-      <select id="classVibe">
-        <option value="">-- Select Vibe --</option>
-        <option value="hip hop">Hip Hop</option>
-        <option value="hype">Hype</option>
-        <option value="old skool">Old Skool</option>
-      </select>
 
 <!-- FAQ -->
 <label>FAQs:</label>
@@ -114,10 +97,6 @@ const storage = getStorage(app);
 const heroImageInput = document.getElementById("heroImage");
 const heroPreview = document.getElementById("heroPreview");
 const aboutText = document.getElementById("aboutText");
-const classCost = document.getElementById("classCost");
-const classSize = document.getElementById("classSize");
-const spotsAvailable = document.getElementById("spotsAvailable");
-const classVibe = document.getElementById("classVibe");
 const contactInfo = document.getElementById("contactInfo");
 const saveSettingsBtn = document.getElementById("saveSettings");
 const faqContainer = document.getElementById("faqContainer");
@@ -246,10 +225,7 @@ async function loadSettings() {
       const data = docSnap.data();
       heroPreview.src = data.heroImage || "";
       aboutText.value = data.about || "";
-      classCost.value = data.classCost || "";
-      classSize.value = data.classSize || "";
-      spotsAvailable.value = data.spotsAvailable || "";
-      classVibe.value = data.vibe || "";
+
       contactInfo.value = data.contact || "";
 
       // Load FAQs dynamically
@@ -288,10 +264,7 @@ saveSettingsBtn.addEventListener("click", async () => {
     const settingsData = {
       heroImage: heroUrl,
       about: aboutText.value,
-      classCost: parseFloat(classCost.value) || 0,
-      classSize: parseInt(classSize.value) || 0,
-      spotsAvailable: parseInt(spotsAvailable.value) || 0,
-      vibe: classVibe.value,
+
       faq: faqs,
       contact: contactInfo.value,
       updatedAt: Timestamp.fromDate(new Date())

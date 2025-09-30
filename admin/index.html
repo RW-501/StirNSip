@@ -53,9 +53,27 @@
 
       <label>
         <input type="checkbox" id="classVisible" checked />
-        Visible to Patrons
+        Visible
       </label>
 
+            <!-- Classes Info -->
+      <label for="classCost">Class Cost ($):</label>
+      <input type="number" id="classCost" min="0" step="0.01" />
+
+      <label for="classSize">Class Size:</label>
+      <input type="number" id="classSize" min="1" />
+
+      <label for="spotsAvailable">Spots Available:</label>
+      <input type="number" id="spotsAvailable" min="0" />
+
+      <!-- Vibe -->
+      <label for="classVibe">Vibe:</label>
+      <select id="classVibe">
+        <option value="">-- Select Vibe --</option>
+        <option value="hip hop">Hip Hop</option>
+        <option value="hype">Hype</option>
+        <option value="old skool">Old Skool</option>
+      </select>
       <label for="classCover">Class Cover Image:</label>
       <select id="classCover">
         <option value="">-- Select Cover --</option>

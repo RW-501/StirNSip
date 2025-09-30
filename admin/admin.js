@@ -38,6 +38,10 @@ const galleryForm = document.getElementById("gallery-form");
 const galleryList = document.getElementById("gallery-list");
 
 
+const classCost = document.getElementById("classCost");
+const classSize = document.getElementById("classSize");
+const spotsAvailable = document.getElementById("spotsAvailable");
+const classVibe = document.getElementById("classVibe");
 
 const auth = getAuth();
 const loginScreen = document.getElementById("login-screen");
@@ -175,6 +179,10 @@ classForm.addEventListener("submit", async (e) => {
     description: document.getElementById("classDescription").value,
     recipe: document.getElementById("classRecipe").value || "",
     visible: document.getElementById("classVisible").checked,
+          classCost: parseFloat(classCost.value) || 0,
+      classSize: parseInt(classSize.value) || 0,
+      spotsAvailable: parseInt(spotsAvailable.value) || 0,
+      vibe: classVibe.value,
     coverImage: classCoverSelect.value || "",
     updatedAt: new Date(),
   };
@@ -223,6 +231,10 @@ function renderClasses(docs) {
       <button data-id="${docSnap.id}" class="delete-btn">Delete</button>
       <button data-id="${docSnap.id}" class="toggle-btn">${data.visible ? "Hide" : "Show"}</button>
     `;
+          classCost.value = data.classCost || "";
+      classSize.value = data.classSize || "";
+      spotsAvailable.value = data.spotsAvailable || "";
+      classVibe.value = data.vibe || "";
     classesList.appendChild(div);
   });
 
