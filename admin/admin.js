@@ -139,18 +139,7 @@ verifyCodeBtn.addEventListener("click", async () => {
 });
 
 
-// Login button
-loginBtn.addEventListener("click", async () => {
-  const email = loginEmail.value;
-  const password = loginPassword.value;
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    loginError.textContent = "";
-  } catch(err) {
-    console.error("Login error:", err);
-    loginError.textContent = "Invalid email or password.";
-  }
-});
+
 
 
 // -------------------- Classes --------------------
