@@ -90,29 +90,28 @@
     <div id="admin-classes-list"></div>
 
     <hr/>
+<!-- GALLERY UPLOAD SECTION -->
+<section id="gallery-section">
+  <h2>Event / Class Gallery</h2>
 
-    <!-- GALLERY UPLOAD SECTION -->
-    <section id="gallery-section">
-<h2>Event / Class Gallery</h2>
+  <div id="drop-zone" style="border:2px dashed #aaa; padding:1rem; text-align:center; margin-bottom:1rem;">
+    Drag & Drop Images Here
+  </div>
 
-<div id="drop-zone" style="border:2px dashed #aaa; padding:1rem; text-align:center; margin-bottom:1rem;">
-  Drag & Drop Images Here
-</div>
-    <div id="galleryList"></div>
+  <form id="gallery-form">
+    <input type="file" id="galleryImage" accept="image/*" multiple hidden />
+    <input type="text" id="galleryGroup" placeholder="Group / Category" />
+    <label>
+      <input type="checkbox" id="galleryCover" />
+      Set as Cover Image
+    </label>
+    <button type="submit">Upload Image</button>
+  </form>
 
-<form id="gallery-form">
-  <input type="file" id="galleryImage" accept="image/*" multiple />
-  <input type="text" id="galleryGroup" placeholder="Group / Category" />
-  <label>
-    <input type="checkbox" id="galleryCover" />
-    Set as Cover Image
-  </label>
-  <button type="submit">Upload Image</button>
-</form>
+  <!-- unified ID (only one!) -->
+  <div id="galleryList" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+</section>
 
-<div id="gallery-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
-
-    </section>
 </div>
 
 

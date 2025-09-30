@@ -60,8 +60,6 @@ onAuthStateChanged(auth, (user) => {
 // Initial load
 loadClasses();
 
-      // Live listener for classes
-    onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
 
     } else {
       auth.signOut();
@@ -234,39 +232,35 @@ cancelEditBtn.addEventListener("click", () => {
   loadClasses();
 });
 
+// Drag & Drop handling
+const dropZone = document.getElementById("drop-zone");
+const galleryInput = document.getElementById("galleryImage");
 
-// -------------------- Classes --------------------
-async function loadCoverOptions(className) {
-  const gallerySnapshot = await getDocs(collection(db, "gallery"));
-  classCoverSelect.innerHTML = `<option value="">-- Select Cover --</option>`;
-  
-  gallerySnapshot.docs.forEach(docSnap => {
-    const data = docSnap.data();
-    if (data.eventName === className) {
-      const option = document.createElement("option");
-      option.value = data.url;
-      option.textContent = `${data.date} - ${data.group || "Gallery"}`;
-      classCoverSelect.appendChild(option);
-    }
-  });
-}
+dropZone.addEventListener("click", () => galleryInput.click());
 
+dropZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  dropZone.style.borderColor = "#333";
+});
+dropZone.addEventListener("dragleave", () => {
+  dropZone.style.borderColor = "#aaa";
+});
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  dropZone.style.borderColor = "#aaa";
+  galleryInput.files = e.dataTransfer.files;
+});
 
-
-
-
-
-// -------------------- Gallery --------------------
+// -------------------- Gallery Upload --------------------
 galleryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const files = document.getElementById("galleryImage").files;
+  const files = galleryInput.files;
   if (!files.length) return alert("Please select at least one image");
 
   const group = document.getElementById("galleryGroup").value;
   const isCover = document.getElementById("galleryCover").checked;
 
-  // Loop through each file and upload
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const fileName = `${Date.now()}_${file.name}`;
@@ -278,75 +272,55 @@ galleryForm.addEventListener("submit", async (e) => {
 
       await addDoc(collection(db, "gallery"), {
         group,
-        cover: isCover && i === 0, // mark only the first file as cover if checked
+        cover: isCover && i === 0, // only first file marked cover
         url: imageUrl,
-        visible: true, // can hide/show later
+        visible: true,
         createdAt: new Date()
       });
     } catch (err) {
       console.error("Error uploading image: ", err);
+      alert("Error uploading some files. Check console.");
     }
   }
 
   alert(`${files.length} image(s) uploaded!`);
   galleryForm.reset();
-
-  // Refresh cover options if editing a class
-  const currentClassName = document.getElementById("className").value;
-  if (currentClassName) loadCoverOptions(currentClassName);
+  galleryInput.value = "";
 });
 
-
-// Live gallery rendering
+// -------------------- Gallery Live Render --------------------
 onSnapshot(collection(db, "gallery"), snapshot => {
   galleryList.innerHTML = "";
   snapshot.docs.forEach(docSnap => {
     const data = docSnap.data();
+    const id = docSnap.id;
+
     const div = document.createElement("div");
     div.classList.add("gallery-item");
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "5px";
+
     div.innerHTML = `
       <img src="${data.url}" alt="${data.group}" width="150"/>
-      <p><strong>Group:</strong> ${data.group}</p>
-      ${data.cover ? `<p><em>Cover Image</em></p>` : ""}
+      <p><strong>Group:</strong> ${data.group || "N/A"}</p>
+      ${data.cover ? `<p style="color:green;"><em>Cover Image</em></p>` : ""}
+      <button data-id="${id}" class="delete-gallery">Delete</button>
     `;
+
     galleryList.appendChild(div);
   });
-});
 
-const dropZone = document.getElementById("drop-zone");
-
-// Prevent default behaviors
-["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
-  dropZone.addEventListener(eventName, e => {
-    e.preventDefault();
-    e.stopPropagation();
+  // Delete handlers
+  document.querySelectorAll(".delete-gallery").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      if (!confirm("Delete this image?")) return;
+      try {
+        await deleteDoc(doc(db, "gallery", btn.dataset.id));
+        alert("Image deleted");
+      } catch (err) {
+        console.error("Error deleting image:", err);
+      }
+    });
   });
 });
 
-// Highlight on drag
-["dragenter", "dragover"].forEach(eventName => {
-  dropZone.addEventListener(eventName, () => dropZone.classList.add("highlight"));
-});
-["dragleave", "drop"].forEach(eventName => {
-  dropZone.addEventListener(eventName, () => dropZone.classList.remove("highlight"));
-});
-
-// Handle dropped files
-dropZone.addEventListener("drop", async (e) => {
-  const dt = e.dataTransfer;
-  const files = dt.files;
-  if (!files.length) return;
-
-  // Populate input for form consistency
-  const fileInput = document.getElementById("galleryImage");
-  
-  // Convert FileList to DataTransfer so input can accept multiple files
-  const dataTransfer = new DataTransfer();
-  for (let i = 0; i < files.length; i++) {
-    dataTransfer.items.add(files[i]);
-  }
-  fileInput.files = dataTransfer.files;
-
-  // Automatically submit the form
-  galleryForm.requestSubmit();
-});
