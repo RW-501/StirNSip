@@ -234,6 +234,7 @@ section {
 }
 
 #contact-form input,
+#contact-form label,
 #contact-form select,
 #contact-form textarea {
     width: 100%;
@@ -245,12 +246,13 @@ section {
     transition: border-color 0.3s;
 }
 
+#contact-form select:focus,
 #contact-form input:focus,
 #contact-form textarea:focus {
     border-color: var(--color-primary);
     outline: none;
 }
-
+#contact-form select,
 #contact-form button {
     background-color: var(--color-accent);
     color: var(--color-light);
