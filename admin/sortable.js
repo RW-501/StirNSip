@@ -4,11 +4,24 @@ import {
   collection,
   addDoc,
   getDocs,
-  onSnapshot,
-  deleteDoc,
-  updateDoc,
-  db,
+  onSnapshot
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
+  authDomain: "stirnsip-978dc.firebaseapp.com",
+  projectId: "stirnsip-978dc",
+  storageBucket: "stirnsip-978dc.firebasestorage.app",
+  messagingSenderId: "727033774529",
+  appId: "1:727033774529:web:b2d103f6231bec75916f40",
+  measurementId: "G-E72374YTPE",
+};
+
+// Init
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 export function makeGallerySortable() {
   let dragged;
