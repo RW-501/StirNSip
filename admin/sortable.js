@@ -7,7 +7,7 @@ import {
   onSnapshot,
   deleteDoc,
   updateDoc,
-  doc,
+  db,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 export function makeGallerySortable() {
