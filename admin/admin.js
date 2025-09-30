@@ -314,7 +314,6 @@ async function editClass(id) {
           const div = document.createElement("div");
           div.className = "date-time-group";
           div.innerHTML = `
-            <input type="date" class="classDate" value="${dt.date}" required />
             <input type="time" class="classTime" value="${dt.time}" required />
             <button type="button" class="removeDateTime">Remove</button>
           `;
