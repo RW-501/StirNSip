@@ -56,7 +56,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     const div = document.createElement("div");
     div.classList.add("gallery-item");
     div.style.border = "1px solid #ddd";
-    div.style.padding = "5px";
+   // div.style.padding = "5px";
 
     div.innerHTML = `
       <img src="${data.url}" alt="${data.group}" width="150"/>
