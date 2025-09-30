@@ -19,6 +19,7 @@ const heroImage = document.getElementById("heroImage");
 const aboutText = document.getElementById("aboutText");
 
 const classesList = document.getElementById("classesList");
+const galleryList = document.getElementById("galleryList");
 
 const faqListEl = document.getElementById("faqList");
 const faqSearch = document.getElementById("faqSearch");
@@ -43,6 +44,29 @@ async function loadSiteSettings() {
     console.error("Error loading site settings:", err);
   }
 }
+
+
+// -------------------- Gallery Live Render --------------------
+onSnapshot(collection(db, "gallery"), snapshot => {
+  galleryList.innerHTML = "";
+  snapshot.docs.forEach(docSnap => {
+    const data = docSnap.data();
+    const id = docSnap.id;
+
+    const div = document.createElement("div");
+    div.classList.add("gallery-item");
+    div.style.border = "1px solid #ddd";
+    div.style.padding = "5px";
+
+    div.innerHTML = `
+      <img src="${data.url}" alt="${data.group}" width="150"/>
+    `;
+
+    galleryList.appendChild(div);
+  });
+
+});
+
 
 function renderFAQ(faqArray) {
   faqListEl.innerHTML = "";
