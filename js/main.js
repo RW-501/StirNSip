@@ -156,7 +156,15 @@ function renderClasses(docs) {
 }
 
 
-    onSnapshot(classesQuery, snapshot => renderClasses(snapshot.docs));
+// Load visible classes
+const classesQuery = query(
+  collection(db, "classes"),
+  where("visible", "==", true),
+  orderBy("dateTimes.0.date", "asc") // Use first date in array if you changed to multiple dates
+);
+
+// Listen for changes
+onSnapshot(classesQuery, snapshot => renderClasses(snapshot.docs));
 
     // Initial site settings load
     loadSiteSettings();
