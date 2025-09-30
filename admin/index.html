@@ -54,22 +54,27 @@
 
     <!-- GALLERY UPLOAD SECTION -->
     <section id="gallery-section">
-      <h2>Event / Class Gallery</h2>
+<h2>Event / Class Gallery</h2>
 
-      <form id="gallery-form">
-        <input type="file" id="galleryImage" accept="image/*" required />
-        <input type="text" id="galleryEvent" placeholder="Event/Class Name" required />
-        <input type="date" id="galleryDate" required />
-        <input type="text" id="galleryLocation" placeholder="Location" />
-        <input type="text" id="galleryGroup" placeholder="Group / Category" />
-        <label>
-          <input type="checkbox" id="galleryCover" />
-          Set as Cover Image
-        </label>
-        <button type="submit">Upload Image</button>
-      </form>
+<div id="drop-zone" style="border:2px dashed #aaa; padding:1rem; text-align:center; margin-bottom:1rem;">
+  Drag & Drop Images Here
+</div>
 
-      <div id="gallery-list"></div>
+<form id="gallery-form">
+  <input type="file" id="galleryImage" accept="image/*" multiple />
+  <input type="text" id="galleryEvent" placeholder="Event/Class Name" required />
+  <input type="date" id="galleryDate" required />
+  <input type="text" id="galleryLocation" placeholder="Location" />
+  <input type="text" id="galleryGroup" placeholder="Group / Category" />
+  <label>
+    <input type="checkbox" id="galleryCover" />
+    Set as Cover Image
+  </label>
+  <button type="submit">Upload Image</button>
+</form>
+
+<div id="gallery-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
+
     </section>
 
   </main>
@@ -83,7 +88,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js" type="module"></script>
-  <script src="js/admin.js" type="module"></script>
+  <script src="/admin/admin.js" type="module"></script>
+  <script src="sortable.js" type="module"></script>
 
   <script>
     // Auto-update year

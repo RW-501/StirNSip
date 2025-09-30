@@ -224,3 +224,28 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     galleryList.appendChild(div);
   });
 });
+
+
+const dropZone = document.getElementById("drop-zone");
+
+// Prevent default behaviors
+["dragenter","dragover","dragleave","drop"].forEach(eventName => {
+  dropZone.addEventListener(eventName, e => e.preventDefault());
+  dropZone.addEventListener(eventName, e => e.stopPropagation());
+});
+
+// Highlight on drag
+["dragenter","dragover"].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => dropZone.classList.add("highlight"));
+});
+["dragleave","drop"].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => dropZone.classList.remove("highlight"));
+});
+
+// Handle dropped files
+dropZone.addEventListener("drop", e => {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  document.getElementById("galleryImage").files = files; // populate form
+  galleryForm.requestSubmit(); // auto-submit
+});
