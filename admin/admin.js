@@ -55,8 +55,10 @@ onAuthStateChanged(auth, (user) => {
     // User logged in
     loginScreen.style.display = "none";
     siteSettings.style.display = "block";
-    loadSettings(); // load settings after login
-  } else {
+
+// Live listener for classes
+onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
+} else {
     // Not logged in
     loginScreen.style.display = "block";
     siteSettings.style.display = "none";
@@ -202,8 +204,6 @@ function renderClasses(docs) {
   });
 }
 
-// Live listener for classes
-onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
 
 // -------------------- Gallery --------------------
 galleryForm.addEventListener("submit", async (e) => {
