@@ -125,3 +125,57 @@ form button:hover {
     padding: 1rem;
   }
 }
+
+
+/* NAVBAR */
+.navbar {
+  background: #3498db;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-brand {
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links li a {
+  color: #fff;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.nav-links li a:hover {
+  opacity: 0.8;
+}
+
+.nav-links li a.active {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+/* MAIN */
+main {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 3rem;
+  background: #2c3e50;
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+}

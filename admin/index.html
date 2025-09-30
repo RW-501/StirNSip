@@ -7,34 +7,57 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <h1>Admin Dashboard</h1>
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="nav-brand">🥄 Stir & Sip Admin</div>
+    <ul class="nav-links">
+      <li><a href="admin.html" class="active">Dashboard</a></li>
+      <li><a href="classes.html">View Classes</a></li>
+      <li><a href="settings.html">Settings</a></li>
+      <li><a href="logout.html">Logout</a></li>
+    </ul>
+  </nav>
 
-  <!-- ADD / EDIT CLASS FORM -->
-  <form id="class-form">
-    <input type="hidden" id="classId" />
-    <input type="text" id="className" placeholder="Class Name" required />
-    <input type="date" id="classDate" required />
-    <input type="time" id="classTime" required />
-    <textarea id="classDescription" placeholder="Description" required></textarea>
-    <textarea id="classRecipe" placeholder="Recipe / Extra Info (optional)"></textarea>
+  <main>
+    <h1>Admin Dashboard</h1>
 
-    <label>
-      <input type="checkbox" id="classVisible" checked />
-      Visible to Patrons
-    </label>
+    <!-- ADD / EDIT CLASS FORM -->
+    <form id="class-form">
+      <input type="hidden" id="classId" />
+      <input type="text" id="className" placeholder="Class Name" required />
+      <input type="date" id="classDate" required />
+      <input type="time" id="classTime" required />
+      <textarea id="classDescription" placeholder="Description" required></textarea>
+      <textarea id="classRecipe" placeholder="Recipe / Extra Info (optional)"></textarea>
 
-    <button type="submit">Save Class</button>
-    <button type="button" id="cancelEdit" style="display:none;">Cancel Edit</button>
-  </form>
+      <label>
+        <input type="checkbox" id="classVisible" checked />
+        Visible to Patrons
+      </label>
 
-  <hr/>
+      <button type="submit">Save Class</button>
+      <button type="button" id="cancelEdit" style="display:none;">Cancel Edit</button>
+    </form>
 
-  <!-- CLASSES LIST -->
-  <div id="admin-classes-list"></div>
+    <hr/>
+
+    <!-- CLASSES LIST -->
+    <div id="admin-classes-list"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <p>&copy; <span id="year"></span> Stir & Sip. Admin Panel.</p>
+  </footer>
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
   <script src="js/admin.js" type="module"></script>
+
+  <script>
+    // Auto-update year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
