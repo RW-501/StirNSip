@@ -20,14 +20,23 @@
 
   <main>
 
-    <!-- Login screen (hidden by default) -->
+<!-- Login screen (hidden by default) -->
 <section id="login-screen" style="display:none; max-width:400px; margin:2rem auto;">
   <h2>Admin Login</h2>
-  <input type="email" id="loginEmail" placeholder="Email" />
-  <input type="password" id="loginPassword" placeholder="Password" />
-  <button id="loginBtn">Login</button>
+
+  <button id="googleLoginBtn">Login with Google</button>
+  <button id="phoneLoginBtn">Login with Phone</button>
+
+  <div id="phoneLoginForm" style="display:none; margin-top:1rem;">
+    <input type="tel" id="phoneNumber" placeholder="+1 555-555-5555" />
+    <button id="sendCodeBtn">Send Code</button>
+    <input type="text" id="verificationCode" placeholder="Enter code" style="display:none; margin-top:0.5rem;" />
+    <button id="verifyCodeBtn" style="display:none; margin-top:0.5rem;">Verify Code</button>
+  </div>
+
   <p id="loginError" style="color:red;"></p>
 </section>
+
 
     <div id="site-settings" style="display:none;">
 

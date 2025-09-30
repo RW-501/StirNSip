@@ -10,7 +10,7 @@ import {
   doc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -40,30 +40,104 @@ const galleryList = document.getElementById("gallery-list");
 
 
 const auth = getAuth();
-
-// DOM
 const loginScreen = document.getElementById("login-screen");
-const loginEmail = document.getElementById("loginEmail");
-const loginPassword = document.getElementById("loginPassword");
-const loginBtn = document.getElementById("loginBtn");
-const loginError = document.getElementById("loginError");
 const siteSettings = document.getElementById("site-settings");
+const loginError = document.getElementById("loginError");
+
+const googleLoginBtn = document.getElementById("googleLoginBtn");
+const phoneLoginBtn = document.getElementById("phoneLoginBtn");
+const phoneLoginForm = document.getElementById("phoneLoginForm");
+const phoneNumberInput = document.getElementById("phoneNumber");
+const sendCodeBtn = document.getElementById("sendCodeBtn");
+const verificationCodeInput = document.getElementById("verificationCode");
+const verifyCodeBtn = document.getElementById("verifyCodeBtn");
+
+// Allowed emails and phone numbers
+const allowedEmails = ["admin@example.com", "owner@stirnsip.com"];
+const allowedPhones = ["+15555555555", "+14445556666"];
 
 // Show/hide sections based on login state
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    // User logged in
-    loginScreen.style.display = "none";
-    siteSettings.style.display = "block";
+    // Check allowed emails/phones
+    const emailOk = user.email && allowedEmails.includes(user.email);
+    const phoneOk = user.phoneNumber && allowedPhones.includes(user.phoneNumber);
 
-// Live listener for classes
-onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
-} else {
-    // Not logged in
+    if (emailOk || phoneOk) {
+      loginScreen.style.display = "none";
+      siteSettings.style.display = "block";
+      
+
+      // Live listener for classes
+    onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
+
+    } else {
+      auth.signOut();
+      loginError.textContent = "Unauthorized user.";
+    }
+  } else {
     loginScreen.style.display = "block";
     siteSettings.style.display = "none";
   }
 });
+
+// Google login
+googleLoginBtn.addEventListener("click", async () => {
+  const provider = new GoogleAuthProvider();
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    if (!allowedEmails.includes(user.email)) {
+      await auth.signOut();
+      loginError.textContent = "Unauthorized Google account.";
+    } else {
+      loginError.textContent = "";
+    }
+  } catch(err) {
+    console.error(err);
+    loginError.textContent = "Google login failed.";
+  }
+});
+
+// Phone login
+phoneLoginBtn.addEventListener("click", () => {
+  phoneLoginForm.style.display = "block";
+  window.recaptchaVerifier = new RecaptchaVerifier('sendCodeBtn', {
+    'size': 'invisible',
+    'callback': () => {}
+  }, auth);
+});
+
+sendCodeBtn.addEventListener("click", async () => {
+  const phoneNumber = phoneNumberInput.value;
+  if (!allowedPhones.includes(phoneNumber)) {
+    loginError.textContent = "Unauthorized phone number.";
+    return;
+  }
+  const appVerifier = window.recaptchaVerifier;
+  try {
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+    window.confirmationResult = confirmationResult;
+    verificationCodeInput.style.display = "block";
+    verifyCodeBtn.style.display = "block";
+    loginError.textContent = "";
+  } catch(err) {
+    console.error(err);
+    loginError.textContent = "Failed to send code.";
+  }
+});
+
+verifyCodeBtn.addEventListener("click", async () => {
+  const code = verificationCodeInput.value;
+  try {
+    await window.confirmationResult.confirm(code);
+    loginError.textContent = "";
+  } catch(err) {
+    console.error(err);
+    loginError.textContent = "Invalid verification code.";
+  }
+});
+
 
 // Login button
 loginBtn.addEventListener("click", async () => {
