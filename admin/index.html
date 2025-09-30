@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin | Stir & Sip</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+  <h1>Admin Dashboard</h1>
+
+  <!-- ADD / EDIT CLASS FORM -->
+  <form id="class-form">
+    <input type="hidden" id="classId" />
+    <input type="text" id="className" placeholder="Class Name" required />
+    <input type="date" id="classDate" required />
+    <input type="time" id="classTime" required />
+    <textarea id="classDescription" placeholder="Description" required></textarea>
+    <textarea id="classRecipe" placeholder="Recipe / Extra Info (optional)"></textarea>
+
+    <label>
+      <input type="checkbox" id="classVisible" checked />
+      Visible to Patrons
+    </label>
+
+    <button type="submit">Save Class</button>
+    <button type="button" id="cancelEdit" style="display:none;">Cancel Edit</button>
+  </form>
+
+  <hr/>
+
+  <!-- CLASSES LIST -->
+  <div id="admin-classes-list"></div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+  <script src="js/admin.js" type="module"></script>
+</body>
+</html>

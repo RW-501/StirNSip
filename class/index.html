@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Details | Stir & Sip</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="sticky-header">
+    <nav class="nav-container">
+      <a href="index.html" class="logo">Stir & Sip</a>
+    </nav>
+  </header>
+
+  <!-- CLASS DETAILS -->
+  <section id="class-detail" class="class-detail">
+    <h1 id="className">Loading...</h1>
+    <p id="classDate"></p>
+    <p id="classTime"></p>
+    <p id="classDescription"></p>
+
+    <!-- Recipe Section (Future-ready) -->
+    <div id="recipe-section" class="recipe-section">
+      <h2>Recipe & Extras</h2>
+      <div id="recipeContent">
+        <p>Recipes and extras will appear here for this class.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2025 Stir & Sip</p>
+  </footer>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+  <script src="js/class.js" type="module"></script>
+</body>
+</html>

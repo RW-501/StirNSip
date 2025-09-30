@@ -1,0 +1,158 @@
+/* ========================================
+   VARIABLES
+======================================== */
+:root {
+  --color-terra: #E07A5F;
+  --color-mustard: #F4D35E;
+  --color-olive: #6A994E;
+  --color-cream: #FFF3E2;
+  --font-header: 'Pacifico', cursive;
+  --font-body: 'Open Sans', sans-serif;
+}
+
+/* ========================================
+   RESET & BASE
+======================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  line-height: 1.6;
+  background-color: var(--color-cream);
+  color: #333;
+}
+
+/* ========================================
+   NAVIGATION
+======================================== */
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background: var(--color-cream);
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+  color: var(--color-terra);
+}
+
+/* ========================================
+   HERO
+======================================== */
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4rem 2rem;
+  background: var(--color-mustard);
+  color: #333;
+  text-align: center;
+}
+
+.hero-content h1 {
+  font-family: var(--font-header);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.cta-btn {
+  background-color: var(--color-terra);
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border-radius: 25px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.cta-btn:hover {
+  background-color: var(--color-olive);
+}
+
+.hero-images {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.hero-images img {
+  width: 250px;
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+}
+
+.hero-images img:hover {
+  transform: scale(1.05);
+}
+
+/* ========================================
+   ABOUT
+======================================== */
+.about {
+  padding: 4rem 2rem;
+  background-color: var(--color-cream);
+  text-align: center;
+}
+
+.about h2 {
+  font-family: var(--font-header);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.about p {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   FOOTER
+======================================== */
+footer {
+  background-color: var(--color-olive);
+  color: white;
+  padding: 2rem;
+  text-align: center;
+}
+
+footer a {
+  color: var(--color-mustard);
+  margin: 0 0.5rem;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .hero-images {
+    justify-content: center;
+  }
+}
