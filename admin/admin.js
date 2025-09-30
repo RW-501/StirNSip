@@ -28,21 +28,6 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-// DOM
-const classForm = document.getElementById("class-form");
-const cancelEditBtn = document.getElementById("cancelEdit");
-const classesList = document.getElementById("admin-classes-list");
-const classCoverSelect = document.getElementById("classCover");
-const coverPreview = document.getElementById("coverPreview");
-const galleryForm = document.getElementById("gallery-form");
-const galleryList = document.getElementById("gallery-list");
-
-
-const classCost = document.getElementById("classCost");
-const classSize = document.getElementById("classSize");
-const spotsAvailable = document.getElementById("spotsAvailable");
-const classVibe = document.getElementById("classVibe");
-
 const auth = getAuth();
 const loginScreen = document.getElementById("login-screen");
 const siteSettings = document.getElementById("site-settings");
@@ -71,6 +56,9 @@ onAuthStateChanged(auth, (user) => {
       loginScreen.style.display = "none";
       siteSettings.style.display = "block";
       
+
+// Initial load
+loadClasses();
 
       // Live listener for classes
     onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
@@ -145,6 +133,107 @@ verifyCodeBtn.addEventListener("click", async () => {
 
 
 
+const classForm = document.getElementById("class-form"); const cancelEditBtn = document.getElementById("cancelEdit"); const classesList = document.getElementById("admin-classes-list"); const classCoverSelect = document.getElementById("classCover"); const coverPreview = document.getElementById("coverPreview"); const galleryForm = document.getElementById("gallery-form"); const galleryList = document.getElementById("gallery-list"); const classCost = document.getElementById("classCost"); const classSize = document.getElementById("classSize"); const spotsAvailable = document.getElementById("spotsAvailable"); const classVibe = document.getElementById("classVibe");
+
+// Load & Render Classes
+async function loadClasses() {
+  classesList.innerHTML = "<p>Loading classes...</p>";
+  try {
+    const q = query(collection(db, "classes"), orderBy("date", "asc"));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      classesList.innerHTML = "<p>No classes added yet.</p>";
+      return;
+    }
+
+    classesList.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const cls = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "class-item";
+
+      div.innerHTML = `
+        <h4>${cls.name}</h4>
+        <p><strong>Date:</strong> ${cls.date} ${cls.time}</p>
+        <p><strong>Cost:</strong> $${cls.classCost?.toFixed(2) || 0}</p>
+        <p><strong>Size:</strong> ${cls.classSize}</p>
+        <p><strong>Spots:</strong> ${cls.spotsAvailable}</p>
+        <p><strong>Vibe:</strong> ${cls.vibe || "N/A"}</p>
+        <img src="${cls.coverImage || ""}" alt="Cover" style="max-width:150px;" />
+        <p>${cls.description}</p>
+        <button data-id="${docSnap.id}" class="edit-class">Edit</button>
+        <button data-id="${docSnap.id}" class="delete-class">Delete</button>
+      `;
+
+      classesList.appendChild(div);
+    });
+
+    // Attach edit / delete handlers
+    document.querySelectorAll(".edit-class").forEach(btn => {
+      btn.addEventListener("click", () => editClass(btn.dataset.id));
+    });
+
+    document.querySelectorAll(".delete-class").forEach(btn => {
+      btn.addEventListener("click", () => deleteClass(btn.dataset.id));
+    });
+
+  } catch (err) {
+    console.error("Error loading classes:", err);
+    classesList.innerHTML = "<p>Error loading classes.</p>";
+  }
+}
+
+// Edit Class
+async function editClass(id) {
+  try {
+    const docSnap = await getDoc(doc(db, "classes", id));
+    if (docSnap.exists()) {
+      const cls = docSnap.data();
+
+      document.getElementById("classId").value = id;
+      document.getElementById("className").value = cls.name;
+      document.getElementById("classDate").value = cls.date;
+      document.getElementById("classTime").value = cls.time;
+      document.getElementById("classDescription").value = cls.description;
+      document.getElementById("classRecipe").value = cls.recipe || "";
+      document.getElementById("classVisible").checked = cls.visible;
+
+      classCost.value = cls.classCost || 0;
+      classSize.value = cls.classSize || 0;
+      spotsAvailable.value = cls.spotsAvailable || 0;
+      classVibe.value = cls.vibe || "";
+
+      classCoverSelect.value = cls.coverImage || "";
+      coverPreview.src = cls.coverImage || "";
+
+      cancelEditBtn.style.display = "inline-block";
+    }
+  } catch (err) {
+    console.error("Error editing class:", err);
+  }
+}
+
+// Delete Class
+async function deleteClass(id) {
+  if (!confirm("Are you sure you want to delete this class?")) return;
+  try {
+    await deleteDoc(doc(db, "classes", id));
+    alert("Class deleted!");
+    loadClasses();
+  } catch (err) {
+    console.error("Error deleting class:", err);
+  }
+}
+
+// Reload list after save
+classForm.addEventListener("submit", async () => {
+  loadClasses();
+});
+cancelEditBtn.addEventListener("click", () => {
+  loadClasses();
+});
+
 
 // -------------------- Classes --------------------
 async function loadCoverOptions(className) {
@@ -162,122 +251,9 @@ async function loadCoverOptions(className) {
   });
 }
 
-// Preview cover image
-classCoverSelect.addEventListener("change", (e) => {
-  coverPreview.src = e.target.value || "";
-});
 
-// Save / Update class
-classForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
 
-  const id = document.getElementById("classId").value;
-  const data = {
-    name: document.getElementById("className").value,
-    date: document.getElementById("classDate").value,
-    time: document.getElementById("classTime").value,
-    description: document.getElementById("classDescription").value,
-    recipe: document.getElementById("classRecipe").value || "",
-    visible: document.getElementById("classVisible").checked,
-          classCost: parseFloat(classCost.value) || 0,
-      classSize: parseInt(classSize.value) || 0,
-      spotsAvailable: parseInt(spotsAvailable.value) || 0,
-      vibe: classVibe.value,
-    coverImage: classCoverSelect.value || "",
-    updatedAt: new Date(),
-  };
 
-  try {
-    if (id) {
-      await updateDoc(doc(db, "classes", id), data);
-      alert("Class updated!");
-    } else {
-      data.createdAt = new Date();
-      await addDoc(collection(db, "classes"), data);
-      alert("Class added!");
-    }
-    classForm.reset();
-    document.getElementById("classId").value = "";
-    coverPreview.src = "";
-    cancelEditBtn.style.display = "none";
-  } catch (err) {
-    console.error("Error saving class: ", err);
-  }
-});
-
-// Cancel edit
-cancelEditBtn.addEventListener("click", () => {
-  classForm.reset();
-  document.getElementById("classId").value = "";
-  coverPreview.src = "";
-  cancelEditBtn.style.display = "none";
-});
-
-// Render classes
-function renderClasses(docs) {
-  classesList.innerHTML = "";
-  docs.forEach(docSnap => {
-    const data = docSnap.data();
-    const div = document.createElement("div");
-    div.classList.add("class-item");
-    div.innerHTML = `
-      <h3>${data.name} ${!data.visible ? "(Hidden)" : ""}</h3>
-      ${data.coverImage ? `<img src="${data.coverImage}" alt="Cover" width="150"/>` : ""}
-      <p><strong>Date:</strong> ${data.date}</p>
-      <p><strong>Time:</strong> ${data.time}</p>
-      <p>${data.description}</p>
-      ${data.recipe ? `<p><em>Recipe Info: ${data.recipe}</em></p>` : ""}
-      <button data-id="${docSnap.id}" class="edit-btn">Edit</button>
-      <button data-id="${docSnap.id}" class="delete-btn">Delete</button>
-      <button data-id="${docSnap.id}" class="toggle-btn">${data.visible ? "Hide" : "Show"}</button>
-    `;
-          classCost.value = data.classCost || "";
-      classSize.value = data.classSize || "";
-      spotsAvailable.value = data.spotsAvailable || "";
-      classVibe.value = data.vibe || "";
-    classesList.appendChild(div);
-  });
-
-  document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const id = e.target.dataset.id;
-      const docSnap = docs.find(d => d.id === id);
-      const data = docSnap.data();
-
-      document.getElementById("classId").value = id;
-      document.getElementById("className").value = data.name;
-      document.getElementById("classDate").value = data.date;
-      document.getElementById("classTime").value = data.time;
-      document.getElementById("classDescription").value = data.description;
-      document.getElementById("classRecipe").value = data.recipe || "";
-      document.getElementById("classVisible").checked = data.visible ?? true;
-
-      await loadCoverOptions(data.name);
-      classCoverSelect.value = data.coverImage || "";
-      coverPreview.src = data.coverImage || "";
-
-      cancelEditBtn.style.display = "inline-block";
-    });
-  });
-
-  document.querySelectorAll(".delete-btn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const id = e.target.dataset.id;
-      if (confirm("Delete this class?")) {
-        await deleteDoc(doc(db, "classes", id));
-      }
-    });
-  });
-
-  document.querySelectorAll(".toggle-btn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
-      const id = e.target.dataset.id;
-      const docSnap = docs.find(d => d.id === id);
-      const visible = !docSnap.data().visible;
-      await updateDoc(doc(db, "classes", id), { visible });
-    });
-  });
-}
 
 
 // -------------------- Gallery --------------------
@@ -287,9 +263,6 @@ galleryForm.addEventListener("submit", async (e) => {
   const files = document.getElementById("galleryImage").files;
   if (!files.length) return alert("Please select at least one image");
 
-  const eventName = document.getElementById("galleryEvent").value;
-  const date = document.getElementById("galleryDate").value;
-  const location = document.getElementById("galleryLocation").value;
   const group = document.getElementById("galleryGroup").value;
   const isCover = document.getElementById("galleryCover").checked;
 
@@ -304,9 +277,6 @@ galleryForm.addEventListener("submit", async (e) => {
       const imageUrl = await getDownloadURL(storageRef);
 
       await addDoc(collection(db, "gallery"), {
-        eventName,
-        date,
-        location,
         group,
         cover: isCover && i === 0, // mark only the first file as cover if checked
         url: imageUrl,
@@ -335,10 +305,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     const div = document.createElement("div");
     div.classList.add("gallery-item");
     div.innerHTML = `
-      <img src="${data.url}" alt="${data.eventName}" width="150"/>
-      <p><strong>Event:</strong> ${data.eventName}</p>
-      <p><strong>Date:</strong> ${data.date}</p>
-      <p><strong>Location:</strong> ${data.location}</p>
+      <img src="${data.url}" alt="${data.group}" width="150"/>
       <p><strong>Group:</strong> ${data.group}</p>
       ${data.cover ? `<p><em>Cover Image</em></p>` : ""}
     `;
