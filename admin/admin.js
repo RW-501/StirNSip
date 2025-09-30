@@ -10,6 +10,7 @@ import {
   doc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -35,6 +36,46 @@ const classCoverSelect = document.getElementById("classCover");
 const coverPreview = document.getElementById("coverPreview");
 const galleryForm = document.getElementById("gallery-form");
 const galleryList = document.getElementById("gallery-list");
+
+
+
+const auth = getAuth();
+
+// DOM
+const loginScreen = document.getElementById("login-screen");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginBtn = document.getElementById("loginBtn");
+const loginError = document.getElementById("loginError");
+const siteSettings = document.getElementById("site-settings");
+
+// Show/hide sections based on login state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User logged in
+    loginScreen.style.display = "none";
+    siteSettings.style.display = "block";
+    loadSettings(); // load settings after login
+  } else {
+    // Not logged in
+    loginScreen.style.display = "block";
+    siteSettings.style.display = "none";
+  }
+});
+
+// Login button
+loginBtn.addEventListener("click", async () => {
+  const email = loginEmail.value;
+  const password = loginPassword.value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginError.textContent = "";
+  } catch(err) {
+    console.error("Login error:", err);
+    loginError.textContent = "Invalid email or password.";
+  }
+});
 
 // -------------------- Classes --------------------
 async function loadCoverOptions(className) {

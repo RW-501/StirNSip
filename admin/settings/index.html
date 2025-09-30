@@ -18,9 +18,18 @@
   </nav>
 
   <main>
-    <h1>Site Settings</h1>
+<!-- Login screen (hidden by default) -->
+<section id="login-screen" style="display:none; max-width:400px; margin:2rem auto;">
+  <h2>Admin Login</h2>
+  <input type="email" id="loginEmail" placeholder="Email" />
+  <input type="password" id="loginPassword" placeholder="Password" />
+  <button id="loginBtn">Login</button>
+  <p id="loginError" style="color:red;"></p>
+</section>
 
-    <section id="site-settings">
+<section id="site-settings" style="display:none;">
+          <h1>Site Settings</h1>
+
       <!-- Hero Image -->
       <label for="heroImage">Hero Image:</label>
       <input type="file" id="heroImage" accept="image/*" />
@@ -73,6 +82,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getFirestore, doc, getDoc, setDoc, updateDoc, Timestamp  } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 // Firebase Config
 const firebaseConfig = {
@@ -102,6 +112,45 @@ const contactInfo = document.getElementById("contactInfo");
 const saveSettingsBtn = document.getElementById("saveSettings");
 const faqContainer = document.getElementById("faqContainer");
 const addFaqBtn = document.getElementById("addFaqBtn");
+
+
+const auth = getAuth();
+
+// DOM
+const loginScreen = document.getElementById("login-screen");
+const loginEmail = document.getElementById("loginEmail");
+const loginPassword = document.getElementById("loginPassword");
+const loginBtn = document.getElementById("loginBtn");
+const loginError = document.getElementById("loginError");
+const siteSettings = document.getElementById("site-settings");
+
+// Show/hide sections based on login state
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User logged in
+    loginScreen.style.display = "none";
+    siteSettings.style.display = "block";
+    loadSettings(); // load settings after login
+  } else {
+    // Not logged in
+    loginScreen.style.display = "block";
+    siteSettings.style.display = "none";
+  }
+});
+
+// Login button
+loginBtn.addEventListener("click", async () => {
+  const email = loginEmail.value;
+  const password = loginPassword.value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    loginError.textContent = "";
+  } catch(err) {
+    console.error("Login error:", err);
+    loginError.textContent = "Invalid email or password.";
+  }
+});
 
 // Add FAQ row
 function addFaqItem(question = "", answer = "") {
