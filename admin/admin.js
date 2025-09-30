@@ -131,8 +131,6 @@ verifyCodeBtn.addEventListener("click", async () => {
 });
 
 
-
-
 const classForm = document.getElementById("class-form"); 
 const cancelEditBtn = document.getElementById("cancelEdit"); 
 const classesList = document.getElementById("admin-classes-list"); 
@@ -140,16 +138,17 @@ const classCoverSelect = document.getElementById("classCover");
 const coverPreview = document.getElementById("coverPreview"); 
 const galleryForm = document.getElementById("gallery-form"); 
 const galleryList = document.getElementById("gallery-list"); 
-const classCost = document.getElementById("classCost"); 
 const classSize = document.getElementById("classSize"); 
 const spotsAvailable = document.getElementById("spotsAvailable"); 
 const classVibe = document.getElementById("classVibe");
+const dateTimeContainer = document.getElementById("dateTimeContainer");
+const addDateTimeBtn = document.getElementById("addDateTime");
 
 // Load & Render Classes
 async function loadClasses() {
   classesList.innerHTML = "<p>Loading classes...</p>";
   try {
-    const q = query(collection(db, "classes"), orderBy("date", "asc"));
+    const q = query(collection(db, "classes"), orderBy("name", "asc")); // order by name instead of date since multiple dates exist
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
@@ -163,10 +162,18 @@ async function loadClasses() {
       const div = document.createElement("div");
       div.className = "class-item";
 
+      // Build multiple date/times
+      let dateTimesHTML = "";
+      if (Array.isArray(cls.dateTimes)) {
+        dateTimesHTML = cls.dateTimes.map(dt => `<li>${dt.date} @ ${dt.time}</li>`).join("");
+      }
+
       div.innerHTML = `
         <h4>${cls.name}</h4>
-        <p><strong>Date:</strong> ${cls.date} ${cls.time}</p>
-        <p><strong>Cost:</strong> $${cls.classCost?.toFixed(2) || 0}</p>
+        <ul><strong>Dates/Times:</strong> ${dateTimesHTML || "<li>N/A</li>"}</ul>
+        <p><strong>Singles Cost:</strong> $${cls.singlesCost?.toFixed(2) || 0}</p>
+        <p><strong>Couples Cost:</strong> $${cls.couplesCost?.toFixed(2) || 0}</p>
+        <p><strong>What We're Cooking:</strong> ${cls.whatCooking || "N/A"}</p>
         <p><strong>Size:</strong> ${cls.classSize}</p>
         <p><strong>Spots:</strong> ${cls.spotsAvailable}</p>
         <p><strong>Vibe:</strong> ${cls.vibe || "N/A"}</p>
@@ -194,6 +201,80 @@ async function loadClasses() {
   }
 }
 
+// Handle multiple date/time slots
+addDateTimeBtn.addEventListener("click", () => {
+  const div = document.createElement("div");
+  div.className = "date-time-group";
+  div.innerHTML = `
+    <input type="date" class="classDate" required />
+    <input type="time" class="classTime" required />
+    <button type="button" class="removeDateTime">Remove</button>
+  `;
+  dateTimeContainer.appendChild(div);
+
+  div.querySelector(".removeDateTime").addEventListener("click", () => {
+    div.remove();
+  });
+});
+
+// When saving form → gather all dates/times into an array
+classForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.getElementById("classId").value;
+  const name = document.getElementById("className").value;
+  const description = document.getElementById("classDescription").value;
+  const recipe = document.getElementById("classRecipe").value;
+  const whatCooking = document.getElementById("whatCooking").value;
+  const visible = document.getElementById("classVisible").checked;
+
+  const singlesCost = parseFloat(document.getElementById("singlesCost").value) || 0;
+  const couplesCost = parseFloat(document.getElementById("couplesCost").value) || 0;
+  const size = parseInt(document.getElementById("classSize").value) || 0;
+  const spots = parseInt(document.getElementById("spotsAvailable").value) || 0;
+  const vibe = document.getElementById("classVibe").value;
+  const coverImage = classCoverSelect.value;
+
+  // Collect multiple dates/times
+  const dateTimes = [];
+  document.querySelectorAll(".date-time-group").forEach(group => {
+    const date = group.querySelector(".classDate").value;
+    const time = group.querySelector(".classTime").value;
+    if (date && time) dateTimes.push({ date, time });
+  });
+
+  const classData = {
+    name,
+    description,
+    recipe,
+    whatCooking,
+    visible,
+    singlesCost,
+    couplesCost,
+    classSize: size,
+    spotsAvailable: spots,
+    vibe,
+    coverImage,
+    dateTimes
+  };
+
+  try {
+    if (id) {
+      await updateDoc(doc(db, "classes", id), classData);
+    } else {
+      await addDoc(collection(db, "classes"), classData);
+    }
+    classForm.reset();
+    dateTimeContainer.innerHTML = `<div class="date-time-group">
+      <input type="date" class="classDate" required />
+      <input type="time" class="classTime" required />
+    </div>`; // reset with one date/time
+    loadClasses();
+  } catch (err) {
+    console.error("Error saving class:", err);
+  }
+});
+
 // Edit Class
 async function editClass(id) {
   try {
@@ -203,19 +284,41 @@ async function editClass(id) {
 
       document.getElementById("classId").value = id;
       document.getElementById("className").value = cls.name;
-      document.getElementById("classDate").value = cls.date;
-      document.getElementById("classTime").value = cls.time;
       document.getElementById("classDescription").value = cls.description;
       document.getElementById("classRecipe").value = cls.recipe || "";
+      document.getElementById("whatCooking").value = cls.whatCooking || "";
       document.getElementById("classVisible").checked = cls.visible;
 
-      classCost.value = cls.classCost || 0;
+      document.getElementById("singlesCost").value = cls.singlesCost || 0;
+      document.getElementById("couplesCost").value = cls.couplesCost || 0;
       classSize.value = cls.classSize || 0;
       spotsAvailable.value = cls.spotsAvailable || 0;
       classVibe.value = cls.vibe || "";
 
       classCoverSelect.value = cls.coverImage || "";
       coverPreview.src = cls.coverImage || "";
+
+      // Reset date/time container
+      dateTimeContainer.innerHTML = "";
+      if (Array.isArray(cls.dateTimes) && cls.dateTimes.length > 0) {
+        cls.dateTimes.forEach(dt => {
+          const div = document.createElement("div");
+          div.className = "date-time-group";
+          div.innerHTML = `
+            <input type="date" class="classDate" value="${dt.date}" required />
+            <input type="time" class="classTime" value="${dt.time}" required />
+            <button type="button" class="removeDateTime">Remove</button>
+          `;
+          dateTimeContainer.appendChild(div);
+          div.querySelector(".removeDateTime").addEventListener("click", () => div.remove());
+        });
+      } else {
+        // Add one empty set if none
+        dateTimeContainer.innerHTML = `<div class="date-time-group">
+          <input type="date" class="classDate" required />
+          <input type="time" class="classTime" required />
+        </div>`;
+      }
 
       cancelEditBtn.style.display = "inline-block";
     }
@@ -236,12 +339,10 @@ async function deleteClass(id) {
   }
 }
 
-// Reload list after save
-classForm.addEventListener("submit", async () => {
-  loadClasses();
-});
 cancelEditBtn.addEventListener("click", () => {
+  classForm.reset();
   loadClasses();
+  cancelEditBtn.style.display = "none";
 });
 
 // Drag & Drop handling

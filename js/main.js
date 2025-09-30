@@ -107,33 +107,54 @@ faqSearch.addEventListener("input", () => {
 });
 
 
-    // Render visible classes
-    function renderClasses(docs) {
-      classesList.innerHTML = "";
-      if (docs.length === 0) {
-        classesList.innerHTML = `<p>No upcoming classes yet — check back soon!</p>`;
-        return;
-      }
-      docs.forEach((docSnap) => {
-        const data = docSnap.data();
-        const div = document.createElement("div");
-        div.classList.add("class-card");
-        div.innerHTML = `
-          <h3>${data.name}</h3>
-          <p><strong>Date:</strong> ${data.date} @ ${data.time}</p>
-          <p>${data.description}</p>
-          <a href="class.html?id=${docSnap.id}" class="cta-btn">View Details</a>
-        `;
-        classesList.appendChild(div);
-      });
-    }
+// Render grouped classes
+function renderClasses(docs) {
+  classesList.innerHTML = "";
 
-    // Load visible classes
-    const classesQuery = query(
-      collection(db, "classes"),
-      where("visible", "==", true),
-      orderBy("date", "asc")
-    );
+  if (docs.length === 0) {
+    classesList.innerHTML = `<p>No upcoming classes yet — check back soon!</p>`;
+    return;
+  }
+
+  // Group by class name
+  const grouped = {};
+  docs.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (!grouped[data.name]) {
+      grouped[data.name] = {
+        description: data.description,
+        id: docSnap.id, // keep first ID for details page
+        times: []
+      };
+    }
+    grouped[data.name].times.push({
+      date: data.date,
+      time: data.time
+    });
+  });
+
+  // Render grouped cards
+  Object.entries(grouped).forEach(([name, info]) => {
+    const div = document.createElement("div");
+    div.classList.add("class-card");
+
+    // Make badges for each time
+    const timesHtml = info.times
+      .map(
+        t => `<span class="time-badge">${t.date} @ ${t.time}</span>`
+      )
+      .join(" ");
+
+    div.innerHTML = `
+      <h3>${name}</h3>
+      <div class="time-badges">${timesHtml}</div>
+      <p>${info.description}</p>
+      <a href="class.html?id=${info.id}" class="cta-btn">View Details</a>
+    `;
+    classesList.appendChild(div);
+  });
+}
+
 
     onSnapshot(classesQuery, snapshot => renderClasses(snapshot.docs));
 

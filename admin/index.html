@@ -42,47 +42,65 @@
 
     <h1>Admin Dashboard</h1>
 
-    <!-- ADD / EDIT CLASS FORM -->
-    <form id="class-form">
-      <input type="hidden" id="classId" />
-      <input type="text" id="className" placeholder="Class Name" required />
-      <input type="date" id="classDate" required />
-      <input type="time" id="classTime" required />
-      <textarea id="classDescription" placeholder="Description" required></textarea>
-      <textarea id="classRecipe" placeholder="Recipe / Extra Info (optional)"></textarea>
+<!-- ADD / EDIT CLASS FORM -->
+<form id="class-form">
+  <input type="hidden" id="classId" />
+  <input type="text" id="className" placeholder="Class Name" required />
 
-      <label>
-        <input type="checkbox" id="classVisible" checked />
-        Visible
-      </label>
+  <!-- Multiple Dates/Times -->
+  <div id="dateTimeContainer">
+    <div class="date-time-group">
+      <input type="date" class="classDate" required />
+      <input type="time" class="classTime" required />
+    </div>
+  </div>
+  <button type="button" id="addDateTime">+ Add Another Date/Time</button>
 
-            <!-- Classes Info -->
-      <label for="classCost">Class Cost ($):</label>
-      <input type="number" id="classCost" min="0" step="0.01" />
+  <textarea id="classDescription" placeholder="Description" required></textarea>
+  <textarea id="classRecipe" placeholder="Recipe / Extra Info (optional)"></textarea>
 
-      <label for="classSize">Class Size:</label>
-      <input type="number" id="classSize" min="1" />
+  <!-- What we're cooking -->
+  <input type="text" id="whatCooking" placeholder="What are we cooking?" required />
 
-      <label for="spotsAvailable">Spots Available:</label>
-      <input type="number" id="spotsAvailable" min="0" />
+  <label>
+    <input type="checkbox" id="classVisible" checked />
+    Visible
+  </label>
 
-      <!-- Vibe -->
-      <label for="classVibe">Vibe:</label>
-      <select id="classVibe">
-        <option value="">-- Select Vibe --</option>
-        <option value="hip hop">Hip Hop</option>
-        <option value="hype">Hype</option>
-        <option value="old skool">Old Skool</option>
-      </select>
-      <label for="classCover">Class Cover Image:</label>
-      <select id="classCover">
-        <option value="">-- Select Cover --</option>
-      </select>
-      <img id="coverPreview" src="" alt="Cover Preview" style="max-width:200px; display:block; margin-top:0.5rem;" />
+  <!-- Costs -->
+  <label for="singlesCost">Singles Cost ($):</label>
+  <input type="number" id="singlesCost" min="0" step="0.01" />
 
-      <button type="submit">Save Class</button>
-      <button type="button" id="cancelEdit" style="display:none;">Cancel Edit</button>
-    </form>
+  <label for="couplesCost">Couples Cost ($):</label>
+  <input type="number" id="couplesCost" min="0" step="0.01" />
+
+  <!-- Size -->
+  <label for="classSize">Class Size:</label>
+  <input type="number" id="classSize" min="1" />
+
+  <label for="spotsAvailable">Spots Available:</label>
+  <input type="number" id="spotsAvailable" min="0" />
+
+  <!-- Vibe -->
+  <label for="classVibe">Vibe:</label>
+  <select id="classVibe">
+    <option value="">-- Select Vibe --</option>
+    <option value="hip hop">Hip Hop</option>
+    <option value="hype">Hype</option>
+    <option value="old skool">Old Skool</option>
+  </select>
+
+  <!-- Cover -->
+  <label for="classCover">Class Cover Image:</label>
+  <select id="classCover">
+    <option value="">-- Select Cover --</option>
+  </select>
+  <img id="coverPreview" src="" alt="Cover Preview" style="max-width:200px; display:block; margin-top:0.5rem;" />
+
+  <button type="submit">Save Class</button>
+  <button type="button" id="cancelEdit" style="display:none;">Cancel Edit</button>
+</form>
+
 
     <hr/>
 
