@@ -17,7 +17,7 @@
 // DOM Elements
 const heroImage = document.getElementById("heroImage");
 const aboutText = document.getElementById("aboutText");
-const contactInfoEl = document.getElementById("contactInfo");
+
 const classesList = document.getElementById("classesList");
 
 const faqListEl = document.getElementById("faqList");
@@ -35,7 +35,6 @@ async function loadSiteSettings() {
       // Hero / About / Contact
       heroImage.src = data.heroImage || "";
       aboutText.textContent = data.about || "";
-      contactInfoEl.textContent = data.contact || "";
 
       // Load FAQ
       renderFAQ(data.faq || []);
