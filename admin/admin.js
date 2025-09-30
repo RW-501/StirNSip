@@ -132,7 +132,17 @@ verifyCodeBtn.addEventListener("click", async () => {
 
 
 
-const classForm = document.getElementById("class-form"); const cancelEditBtn = document.getElementById("cancelEdit"); const classesList = document.getElementById("admin-classes-list"); const classCoverSelect = document.getElementById("classCover"); const coverPreview = document.getElementById("coverPreview"); const galleryForm = document.getElementById("gallery-form"); const galleryList = document.getElementById("gallery-list"); const classCost = document.getElementById("classCost"); const classSize = document.getElementById("classSize"); const spotsAvailable = document.getElementById("spotsAvailable"); const classVibe = document.getElementById("classVibe");
+const classForm = document.getElementById("class-form"); 
+const cancelEditBtn = document.getElementById("cancelEdit"); 
+const classesList = document.getElementById("admin-classes-list"); 
+const classCoverSelect = document.getElementById("classCover"); 
+const coverPreview = document.getElementById("coverPreview"); 
+const galleryForm = document.getElementById("gallery-form"); 
+const galleryList = document.getElementById("gallery-list"); 
+const classCost = document.getElementById("classCost"); 
+const classSize = document.getElementById("classSize"); 
+const spotsAvailable = document.getElementById("spotsAvailable"); 
+const classVibe = document.getElementById("classVibe");
 
 // Load & Render Classes
 async function loadClasses() {
