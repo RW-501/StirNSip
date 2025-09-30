@@ -49,9 +49,11 @@
         <option value="old skool">Old Skool</option>
       </select>
 
-      <!-- FAQ -->
-      <label for="faqText">FAQ:</label>
-      <textarea id="faqText" placeholder="List FAQs..." rows="4"></textarea>
+<!-- FAQ -->
+<label>FAQs:</label>
+<div id="faqContainer"></div>
+<button type="button" id="addFaqBtn">+ Add FAQ</button>
+
 
       <!-- Contact Info -->
       <label for="contactInfo">Contact Info (Email / Phone):</label>
@@ -100,26 +102,91 @@
     const contactInfo = document.getElementById("contactInfo");
     const saveSettingsBtn = document.getElementById("saveSettings");
 
-    // Load settings
-    async function loadSettings() {
-      try {
-        const settingsDoc = doc(db, "siteSettings", "main");
-        const docSnap = await getDoc(settingsDoc);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          heroPreview.src = data.heroImage || "";
-          aboutText.value = data.about || "";
-          classCost.value = data.classCost || "";
-          classSize.value = data.classSize || "";
-          spotsAvailable.value = data.spotsAvailable || "";
-          classVibe.value = data.vibe || "";
-          faqText.value = data.faq || "";
-          contactInfo.value = data.contact || "";
-        }
-      } catch(err) {
-        console.error("Error loading settings:", err);
-      }
+const faqContainer = document.getElementById("faqContainer");
+const addFaqBtn = document.getElementById("addFaqBtn");
+
+// Load settings
+async function loadSettings() {
+  try {
+    const settingsDoc = doc(db, "siteSettings", "main");
+    const docSnap = await getDoc(settingsDoc);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      heroPreview.src = data.heroImage || "";
+      aboutText.value = data.about || "";
+      classCost.value = data.classCost || "";
+      classSize.value = data.classSize || "";
+      spotsAvailable.value = data.spotsAvailable || "";
+      classVibe.value = data.vibe || "";
+      contactInfo.value = data.contact || "";
+
+      // Load FAQs
+      faqContainer.innerHTML = "";
+      const faqs = data.faq || [];
+      faqs.forEach(f => addFaqItem(f.question, f.answer));
     }
+  } catch(err) {
+    console.error("Error loading settings:", err);
+  }
+}
+
+// Add a new FAQ row
+function addFaqItem(question = "", answer = "") {
+  const div = document.createElement("div");
+  div.classList.add("faq-item");
+  div.innerHTML = `
+    <input type="text" placeholder="Question" value="${question}" required />
+    <textarea placeholder="Answer" rows="2" required>${answer}</textarea>
+    <button type="button" class="removeFaqBtn">Remove</button>
+  `;
+  faqContainer.appendChild(div);
+
+  div.querySelector(".removeFaqBtn").addEventListener("click", () => {
+    div.remove();
+  });
+}
+
+// Add FAQ button
+addFaqBtn.addEventListener("click", () => addFaqItem());
+
+// Save settings
+saveSettingsBtn.addEventListener("click", async () => {
+  let heroUrl = heroPreview.src;
+
+  if (heroImageInput.files[0]) {
+    heroUrl = await uploadHeroImage(heroImageInput.files[0]);
+    heroPreview.src = heroUrl;
+  }
+
+  // Gather FAQ data
+  const faqs = Array.from(faqContainer.querySelectorAll(".faq-item")).map(item => ({
+    question: item.querySelector("input").value,
+    answer: item.querySelector("textarea").value
+  }));
+
+  const settingsData = {
+    heroImage: heroUrl,
+    about: aboutText.value,
+    classCost: parseFloat(classCost.value) || 0,
+    classSize: parseInt(classSize.value) || 0,
+    spotsAvailable: parseInt(spotsAvailable.value) || 0,
+    vibe: classVibe.value,
+    faq: faqs,
+    contact: contactInfo.value,
+    updatedAt: new Date()
+  };
+
+  try {
+    const settingsDoc = doc(db, "siteSettings", "main");
+    await updateDoc(settingsDoc, settingsData).catch(async () => {
+      await setDoc(settingsDoc, settingsData);
+    });
+    alert("Settings saved!");
+  } catch(err) {
+    console.error("Error saving settings:", err);
+  }
+});
+
 
     // Upload hero image
     async function uploadHeroImage(file) {
