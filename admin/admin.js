@@ -272,76 +272,48 @@ function renderClasses(docs) {
 galleryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-const files = document.getElementById("galleryImage").files;
-if (!files.length) return alert("Please select at least one image");
+  const files = document.getElementById("galleryImage").files;
+  if (!files.length) return alert("Please select at least one image");
 
-
-
-// Auto-refresh cover options if a class is being edited
-const currentClassName = document.getElementById("className").value;
-if (currentClassName) loadCoverOptions(currentClassName);
-
-
-const eventName = document.getElementById("galleryEvent").value;
+  const eventName = document.getElementById("galleryEvent").value;
   const date = document.getElementById("galleryDate").value;
   const location = document.getElementById("galleryLocation").value;
   const group = document.getElementById("galleryGroup").value;
   const isCover = document.getElementById("galleryCover").checked;
 
+  // Loop through each file and upload
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    const fileName = `${Date.now()}_${file.name}`;
+    const storageRef = ref(storage, `gallery/${fileName}`);
 
- for (let i = 0; i < files.length; i++) {
-  const file = files[i];
-  const fileName = `${Date.now()}_${file.name}`;
-  const storageRef = ref(storage, `gallery/${fileName}`);
+    try {
+      await uploadBytes(storageRef, file);
+      const imageUrl = await getDownloadURL(storageRef);
 
-  try {
-    await uploadBytes(storageRef, file);
-    const imageUrl = await getDownloadURL(storageRef);
-
-    await addDoc(collection(db, "gallery"), {
-      eventName,
-      date,
-      location,
-      group,
-      cover: isCover && i === 0, // optional: mark first file as cover if checked
-      url: imageUrl,
-      visible: true, // added so you can hide/show later
-      createdAt: new Date()
-    });
-
-  } catch (err) {
-    console.error("Error uploading image: ", err);
+      await addDoc(collection(db, "gallery"), {
+        eventName,
+        date,
+        location,
+        group,
+        cover: isCover && i === 0, // mark only the first file as cover if checked
+        url: imageUrl,
+        visible: true, // can hide/show later
+        createdAt: new Date()
+      });
+    } catch (err) {
+      console.error("Error uploading image: ", err);
+    }
   }
-}
 
-alert(`${files.length} image(s) uploaded!`);
-galleryForm.reset();
+  alert(`${files.length} image(s) uploaded!`);
+  galleryForm.reset();
 
-  try {
-    await uploadBytes(storageRef, file);
-    const imageUrl = await getDownloadURL(storageRef);
-
-    await addDoc(collection(db, "gallery"), {
-      eventName,
-      date,
-      location,
-      group,
-      cover: isCover,
-      url: imageUrl,
-      createdAt: new Date()
-    });
-
-    alert("Image uploaded!");
-    galleryForm.reset();
-
-    // Auto-refresh cover options if a class is being edited
-    const currentClassName = document.getElementById("className").value;
-    if (currentClassName) loadCoverOptions(currentClassName);
-
-  } catch (err) {
-    console.error("Error uploading image: ", err);
-  }
+  // Refresh cover options if editing a class
+  const currentClassName = document.getElementById("className").value;
+  if (currentClassName) loadCoverOptions(currentClassName);
 });
+
 
 // Live gallery rendering
 onSnapshot(collection(db, "gallery"), snapshot => {
@@ -362,27 +334,40 @@ onSnapshot(collection(db, "gallery"), snapshot => {
   });
 });
 
-
 const dropZone = document.getElementById("drop-zone");
 
 // Prevent default behaviors
-["dragenter","dragover","dragleave","drop"].forEach(eventName => {
-  dropZone.addEventListener(eventName, e => e.preventDefault());
-  dropZone.addEventListener(eventName, e => e.stopPropagation());
+["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+  dropZone.addEventListener(eventName, e => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
 });
 
 // Highlight on drag
-["dragenter","dragover"].forEach(eventName => {
+["dragenter", "dragover"].forEach(eventName => {
   dropZone.addEventListener(eventName, () => dropZone.classList.add("highlight"));
 });
-["dragleave","drop"].forEach(eventName => {
+["dragleave", "drop"].forEach(eventName => {
   dropZone.addEventListener(eventName, () => dropZone.classList.remove("highlight"));
 });
 
 // Handle dropped files
-dropZone.addEventListener("drop", e => {
+dropZone.addEventListener("drop", async (e) => {
   const dt = e.dataTransfer;
   const files = dt.files;
-  document.getElementById("galleryImage").files = files; // populate form
-  galleryForm.requestSubmit(); // auto-submit
+  if (!files.length) return;
+
+  // Populate input for form consistency
+  const fileInput = document.getElementById("galleryImage");
+  
+  // Convert FileList to DataTransfer so input can accept multiple files
+  const dataTransfer = new DataTransfer();
+  for (let i = 0; i < files.length; i++) {
+    dataTransfer.items.add(files[i]);
+  }
+  fileInput.files = dataTransfer.files;
+
+  // Automatically submit the form
+  galleryForm.requestSubmit();
 });
