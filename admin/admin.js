@@ -228,7 +228,7 @@ classForm.addEventListener("submit", async (e) => {
   const whatCooking = document.getElementById("whatCooking").value;
 
   const eventbriteLink = document.getElementById("eventbriteLink").value;
-  const SecondLink = document.getElementById("SecondLink").value;
+  const secondLink = document.getElementById("secondLink").value;
 
   const visible = document.getElementById("classVisible").checked;
 
