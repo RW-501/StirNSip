@@ -38,7 +38,7 @@
   <!-- ABOUT -->
   <section id="aboutSection" class="about">
     <h2>About Stir N' Sip</h2>
-    <p>
+    <p id="aboutText">
       Stir & Sip brings friends, food, and fun together! Our playful classes
       combine cooking with social sipping experiences.
     </p>
@@ -52,18 +52,18 @@
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section id="faqSection" class="faq">
-    <h2>FAQ</h2>
-    <div class="faq-item">
-      <button class="faq-toggle">Do I need cooking experience?</button>
-      <p class="faq-answer">Nope! Our classes are designed for all levels.</p>
-    </div>
-    <div class="faq-item">
-      <button class="faq-toggle">Do you provide ingredients?</button>
-      <p class="faq-answer">Yes, all ingredients are included in your booking.</p>
-    </div>
-  </section>
+<!-- FAQ -->
+<section id="faqSection" class="faq">
+  <h2>FAQ</h2>
+  <input 
+    type="text" 
+    id="faqSearch" 
+    placeholder="Search questions..." 
+    class="faq-search"
+  />
+  <div id="faqList"></div>
+</section>
+
 
   <!-- GALLERY -->
   <section id="gallerySection" class="gallery">

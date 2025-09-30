@@ -14,37 +14,74 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // DOM Elements
-    const classesList = document.getElementById("classes-list");
-    const heroImage = document.getElementById("heroImage");
-    const aboutText = document.getElementById("aboutText");
-    const classCostEl = document.getElementById("classCost");
-    const classSizeEl = document.getElementById("classSize");
-    const spotsAvailableEl = document.getElementById("spotsAvailable");
-    const classVibeEl = document.getElementById("classVibe");
-    const faqTextEl = document.getElementById("faqText");
-    const contactInfoEl = document.getElementById("contactInfo");
+// DOM Elements
+const heroImage = document.getElementById("heroImage");
+const aboutText = document.getElementById("aboutText");
+const contactInfoEl = document.getElementById("contactInfo");
 
-    // Load site-wide settings
-    async function loadSiteSettings() {
-      try {
-        const settingsDoc = doc(db, "siteSettings", "main");
-        const docSnap = await getDoc(settingsDoc);
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          heroImage.src = data.heroImage || "";
-          aboutText.textContent = data.about || "";
-          classCostEl.textContent = data.classCost || "0";
-          classSizeEl.textContent = data.classSize || "0";
-          spotsAvailableEl.textContent = data.spotsAvailable || "0";
-          classVibeEl.textContent = data.vibe || "";
-          faqTextEl.textContent = data.faq || "";
-          contactInfoEl.textContent = data.contact || "";
-        }
-      } catch(err) {
-        console.error("Error loading site settings:", err);
-      }
+const faqListEl = document.getElementById("faqList");
+const faqSearch = document.getElementById("faqSearch");
+
+// Load site-wide settings
+async function loadSiteSettings() {
+  try {
+    const settingsDoc = doc(db, "siteSettings", "main");
+    const docSnap = await getDoc(settingsDoc);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      // Hero / About / Contact
+      heroImage.src = data.heroImage || "";
+      aboutText.textContent = data.about || "";
+      contactInfoEl.textContent = data.contact || "";
+
+      // Load FAQ
+      renderFAQ(data.faq || []);
     }
+  } catch (err) {
+    console.error("Error loading site settings:", err);
+  }
+}
+
+function renderFAQ(faqArray) {
+  faqListEl.innerHTML = "";
+
+  faqArray.forEach(({ question, answer }) => {
+    const item = document.createElement("div");
+    item.className = "faq-item";
+
+    const btn = document.createElement("button");
+    btn.className = "faq-toggle";
+    btn.textContent = question;
+
+    const ans = document.createElement("p");
+    ans.className = "faq-answer";
+    ans.textContent = answer;
+    ans.style.display = "none";
+
+    btn.addEventListener("click", () => {
+      ans.style.display = ans.style.display === "none" ? "block" : "none";
+    });
+
+    item.appendChild(btn);
+    item.appendChild(ans);
+    faqListEl.appendChild(item);
+  });
+}
+
+// Search filter
+faqSearch.addEventListener("input", () => {
+  const term = faqSearch.value.toLowerCase();
+  const items = faqListEl.querySelectorAll(".faq-item");
+
+  items.forEach(item => {
+    const q = item.querySelector(".faq-toggle").textContent.toLowerCase();
+    const a = item.querySelector(".faq-answer").textContent.toLowerCase();
+    item.style.display = q.includes(term) || a.includes(term) ? "block" : "none";
+  });
+});
+
 
     // Render visible classes
     function renderClasses(docs) {

@@ -33,6 +33,11 @@ async function loadClassDetails() {
     return;
   }
 
+            const classCostEl = document.getElementById("classCost");
+    const classSizeEl = document.getElementById("classSize");
+    const spotsAvailableEl = document.getElementById("spotsAvailable");
+    const classVibeEl = document.getElementById("classVibe");
+
   try {
     const docRef = doc(db, "classes", classId);
     const docSnap = await getDoc(docRef);
@@ -45,6 +50,11 @@ async function loadClassDetails() {
       document.getElementById("classTime").textContent = `Time: ${data.time}`;
       document.getElementById("classDescription").textContent = data.description;
 
+          classCostEl.textContent = data.classCost || "0";
+          classSizeEl.textContent = data.classSize || "0";
+          spotsAvailableEl.textContent = data.spotsAvailable || "0";
+          classVibeEl.textContent = data.vibe || "";
+          
       // Recipes / extras (rich text allowed)
       const recipeContainer = document.getElementById("recipeContent");
       if (data.recipe && data.recipe.trim() !== "") {
