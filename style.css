@@ -1,170 +1,301 @@
-/* ========================================
-   VARIABLES
-======================================== */
+/*
+|--------------------------------------------------------------------------
+| STIR & SIP BRAND STYLES
+|--------------------------------------------------------------------------
+*/
+
+/* 1. COLOR PALETTE & TYPOGRAPHY */
 :root {
-  --color-terra: #E07A5F;
-  --color-mustard: #F4D35E;
-  --color-olive: #6A994E;
-  --color-cream: #2c2c2c;
-  --color-font: #f0f0f0;
-  --font-header: 'Pacifico', cursive;
-  --font-body: 'Open Sans', sans-serif;
+    /* Brand Colors (Warm, Bold, Approachable) */
+    --color-primary: #C33535;       /* Deep Red/Maroon - Bold CTA */
+    --color-secondary: #FF8844;     /* Vibrant Orange - Accent */
+    --color-accent: #6C2B6C;        /* Deep Purple - Urban Contrast */
+    --color-dark: #333333;          /* Dark Text/Header */
+    --color-light: #F8F4E3;         /* Off-White/Cream Background */
+    --color-text: #4A4A4A;          /* Default Text */
+
+    /* Typography (Modern, Playful, Readable) */
+    --font-heading: 'Oswald', sans-serif; /* Bold, Urban Headers */
+    --font-body: 'Rubik', sans-serif;    /* Friendly, Rounded Body Text */
+    --font-slogan: 'Pacifico', cursive; /* Optional Hand-lettered accent */
+
+    /* Spacing */
+    --spacing-lg: 4rem;
+    --spacing-md: 2rem;
+    --spacing-sm: 1rem;
 }
 
-/* ========================================
-   RESET & BASE
-======================================== */
-
-/* General reset */
-*, html, body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+/* Global Reset and Body Styles */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-
-
-/* Page background */
 body {
-  font-family: var(--font-body);
-  line-height: 1.6;
-  background-color: var(--color-cream);
-  color: var(--color-font);
-}
-main {
-
-  padding: 2rem;
-
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background-color: var(--color-light);
+    line-height: 1.6;
+    scroll-behavior: smooth;
 }
 
-/* ========================================
-   NAVIGATION
-======================================== */
+h1, h2, h3 {
+    font-family: var(--font-heading);
+    color: var(--color-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--spacing-md);
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 1.75rem; }
+
+/* 2. LAYOUT & UTILITIES */
+section {
+    padding: var(--spacing-lg) 5%;
+    min-height: 60vh;
+}
+
+.nav-container, .hero-content, .class-grid, .gallery-grid, .about {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 3. HEADER & NAVIGATION */
 .sticky-header {
-  position: sticky;
-  top: 0;
-  background: var(--color-cream);
-  z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: var(--spacing-sm) 0;
 }
 
 .nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 5%;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-secondary); /* Accent color for pop */
+    text-decoration: none;
+    letter-spacing: 0.1em;
 }
 
 .nav-links {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
+    list-style: none;
+    display: flex;
 }
 
-.nav-links a {
-  text-decoration: none;
-  color:  var(--color-font);
-  transition: color 0.3s ease;
+.nav-links li a {
+    text-decoration: none;
+    color: var(--color-light);
+    margin-left: var(--spacing-md);
+    padding: 0.5rem 0;
+    transition: color 0.3s;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
 }
 
-.nav-links a:hover {
-  color: var(--color-terra);
+.nav-links li a:hover {
+    color: var(--color-secondary);
 }
 
-/* ========================================
-   HERO
-======================================== */
+/* 4. HERO SECTION */
 .hero {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-around;
-  padding: 4rem 2rem;
-  background: var(--color-mustard);
-  color: var(--color-font);
-  text-align: center;
+    background: url('assets/images/hero_group_cooking.jpg') no-repeat center center/cover;
+    height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    /* Dark overlay for contrast */
+    box-shadow: inset 0 0 0 1000px rgba(0, 0, 0, 0.4);
+}
+
+.hero-content {
+    color: var(--color-light);
+    padding: var(--spacing-md);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .hero-content h1 {
-  font-family: var(--font-header);
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+    font-size: 4.5rem;
+    color: var(--color-light);
+    line-height: 1;
+    margin-bottom: var(--spacing-md);
+    text-shadow: 3px 3px var(--color-primary); /* Bold, stacked look */
 }
 
 .cta-btn {
-  background-color: var(--color-terra);
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  text-decoration: none;
-  transition: background 0.3s ease;
+    display: inline-block;
+    background-color: var(--color-primary);
+    color: var(--color-light);
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.75rem 2rem;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
+    border: 2px solid var(--color-primary);
 }
 
 .cta-btn:hover {
-  background-color: var(--color-olive);
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    transform: translateY(-2px);
 }
 
-.hero-images {
-  display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+/* 5. CLASSES & GALLERY GRIDS */
+.class-grid, .gallery-grid {
+    display: grid;
+    gap: var(--spacing-md);
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
 }
 
-.hero-images img {
-  width: 250px;
-  border-radius: 15px;
-  transition: transform 0.3s ease;
+.class-item { /* Assuming structure for dynamically loaded classes */
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    border-bottom: 5px solid var(--color-secondary);
 }
 
-.hero-images img:hover {
-  transform: scale(1.05);
+.class-item:hover {
+    transform: translateY(-5px);
 }
 
-/* ========================================
-   ABOUT
-======================================== */
-.about {
-  padding: 4rem 2rem;
-  background-color: var(--color-cream);
-  text-align: center;
+.gallery-grid img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.about h2 {
-  font-family: var(--font-header);
-  font-size: 2rem;
-  margin-bottom: 1rem;
+/* 6. FAQ SECTION */
+.faq {
+    background-color: var(--color-dark);
+    color: var(--color-light);
 }
 
-.about p {
-  max-width: 600px;
-  margin: 0 auto;
+.faq h2 {
+    color: var(--color-light);
 }
 
-/* ========================================
-   FOOTER
-======================================== */
+.faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    margin-bottom: var(--spacing-sm);
+}
+
+.faq-toggle {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: var(--color-secondary);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    padding: var(--spacing-sm) 0;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.faq-answer {
+    padding: 0 var(--spacing-sm) var(--spacing-sm) 0;
+    display: none; /* Controlled via JS */
+}
+
+/* 7. CONTACT FORM */
+.contact {
+    background-color: var(--color-light);
+    text-align: center;
+}
+
+#contact-form {
+    max-width: 600px;
+    margin: var(--spacing-md) auto;
+    display: grid;
+    gap: var(--spacing-sm);
+}
+
+#contact-form input,
+#contact-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--color-text);
+    border-radius: 5px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+#contact-form input:focus,
+#contact-form textarea:focus {
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+#contact-form button {
+    background-color: var(--color-accent);
+    color: var(--color-light);
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    padding: 0.75rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#contact-form button:hover {
+    background-color: var(--color-primary);
+}
+
+/* 8. FOOTER */
 footer {
-  background-color: var(--color-olive);
-  color: white;
-  padding: 2rem;
-  text-align: center;
+    background-color: var(--color-dark);
+    color: var(--color-light);
+    text-align: center;
+    padding: var(--spacing-md) 5%;
+    font-size: 0.9rem;
+    border-top: 5px solid var(--color-secondary);
 }
 
-footer a {
-  color: var(--color-mustard);
-  margin: 0 0.5rem;
-}
-
-/* ========================================
-   RESPONSIVE
-======================================== */
+/* 9. RESPONSIVENESS */
 @media (max-width: 768px) {
-  .hero {
-    flex-direction: column;
-  }
+    h1 { font-size: 3rem; }
+    h2 { font-size: 2rem; }
 
-  .hero-images {
-    justify-content: center;
-  }
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .nav-links {
+        margin-top: var(--spacing-sm);
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .nav-links li a {
+        margin-left: 0;
+        padding: 0.5rem 0;
+        display: block;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
 }
