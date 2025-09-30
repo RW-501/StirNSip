@@ -72,15 +72,29 @@
   </section>
 
   <!-- CONTACT -->
-  <section id="contactSection" class="contact">
-    <h2>Contact Us</h2>
-    <form id="contact-form">
-      <input type="text" placeholder="Your Name" required>
-      <input type="email" placeholder="Your Email" required>
-      <textarea placeholder="Message" required></textarea>
-      <button type="submit">Send</button>
-    </form>
-  </section>
+<section id="contactSection" class="contact">
+  <h2>Contact Us</h2>
+  <form id="contact-form">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your Email" required>
+
+    <!-- Subject Dropdown -->
+    <label for="subject">Subject:</label>
+    <select id="subject" name="subject" required>
+      <option value="">-- Select Subject --</option>
+      <option value="general">General Question</option>
+      <option value="business">Business Inquiry</option>
+      <option value="franchise">Franchise Inquiry</option>
+      <option value="event">Event / Booking</option>
+      <option value="feedback">Feedback / Suggestions</option>
+      <option value="other">Other</option>
+    </select>
+
+    <textarea name="message" placeholder="Message" required></textarea>
+    <button type="submit">Send</button>
+  </form>
+</section>
+
 
   <!-- FOOTER -->
   <footer>
