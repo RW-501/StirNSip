@@ -35,6 +35,12 @@
         Visible to Patrons
       </label>
 
+      <label for="classCover">Class Cover Image:</label>
+      <select id="classCover">
+        <option value="">-- Select Cover --</option>
+      </select>
+      <img id="coverPreview" src="" alt="Cover Preview" style="max-width:200px; display:block; margin-top:0.5rem;" />
+
       <button type="submit">Save Class</button>
       <button type="button" id="cancelEdit" style="display:none;">Cancel Edit</button>
     </form>
@@ -43,29 +49,30 @@
 
     <!-- CLASSES LIST -->
     <div id="admin-classes-list"></div>
+
+    <hr/>
+
+    <!-- GALLERY UPLOAD SECTION -->
+    <section id="gallery-section">
+      <h2>Event / Class Gallery</h2>
+
+      <form id="gallery-form">
+        <input type="file" id="galleryImage" accept="image/*" required />
+        <input type="text" id="galleryEvent" placeholder="Event/Class Name" required />
+        <input type="date" id="galleryDate" required />
+        <input type="text" id="galleryLocation" placeholder="Location" />
+        <input type="text" id="galleryGroup" placeholder="Group / Category" />
+        <label>
+          <input type="checkbox" id="galleryCover" />
+          Set as Cover Image
+        </label>
+        <button type="submit">Upload Image</button>
+      </form>
+
+      <div id="gallery-list"></div>
+    </section>
+
   </main>
-
-  <hr/>
-
-<!-- GALLERY UPLOAD SECTION -->
-<section id="gallery-section">
-  <h2>Event / Class Gallery</h2>
-
-  <form id="gallery-form">
-    <input type="file" id="galleryImage" accept="image/*" required />
-    <input type="text" id="galleryEvent" placeholder="Event/Class Name" required />
-    <input type="date" id="galleryDate" required />
-    <input type="text" id="galleryLocation" placeholder="Location" />
-    <input type="text" id="galleryGroup" placeholder="Group / Category" />
-    <label>
-      <input type="checkbox" id="galleryCover" />
-      Set as Cover Image
-    </label>
-    <button type="submit">Upload Image</button>
-  </form>
-
-  <div id="gallery-list"></div>
-</section>
 
   <!-- FOOTER -->
   <footer class="footer">
@@ -75,6 +82,7 @@
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js" type="module"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js" type="module"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js" type="module"></script>
   <script src="js/admin.js" type="module"></script>
 
   <script>

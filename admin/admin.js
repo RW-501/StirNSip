@@ -1,4 +1,3 @@
-// js/admin.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import {
   getFirestore,
@@ -10,11 +9,9 @@ import {
   updateDoc,
   doc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
 
-
-// Config
+// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
   authDomain: "stirnsip-978dc.firebaseapp.com",
@@ -28,14 +25,37 @@ const firebaseConfig = {
 // Init
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-// Init Storage
 const storage = getStorage(app);
-
 
 // DOM
 const classForm = document.getElementById("class-form");
 const cancelEditBtn = document.getElementById("cancelEdit");
 const classesList = document.getElementById("admin-classes-list");
+const classCoverSelect = document.getElementById("classCover");
+const coverPreview = document.getElementById("coverPreview");
+const galleryForm = document.getElementById("gallery-form");
+const galleryList = document.getElementById("gallery-list");
+
+// -------------------- Classes --------------------
+async function loadCoverOptions(className) {
+  const gallerySnapshot = await getDocs(collection(db, "gallery"));
+  classCoverSelect.innerHTML = `<option value="">-- Select Cover --</option>`;
+  
+  gallerySnapshot.docs.forEach(docSnap => {
+    const data = docSnap.data();
+    if (data.eventName === className) {
+      const option = document.createElement("option");
+      option.value = data.url;
+      option.textContent = `${data.date} - ${data.group || "Gallery"}`;
+      classCoverSelect.appendChild(option);
+    }
+  });
+}
+
+// Preview cover image
+classCoverSelect.addEventListener("change", (e) => {
+  coverPreview.src = e.target.value || "";
+});
 
 // Save / Update class
 classForm.addEventListener("submit", async (e) => {
@@ -49,22 +69,22 @@ classForm.addEventListener("submit", async (e) => {
     description: document.getElementById("classDescription").value,
     recipe: document.getElementById("classRecipe").value || "",
     visible: document.getElementById("classVisible").checked,
+    coverImage: classCoverSelect.value || "",
     updatedAt: new Date(),
   };
 
   try {
     if (id) {
-      // Update existing
       await updateDoc(doc(db, "classes", id), data);
       alert("Class updated!");
     } else {
-      // Add new
       data.createdAt = new Date();
       await addDoc(collection(db, "classes"), data);
       alert("Class added!");
     }
     classForm.reset();
     document.getElementById("classId").value = "";
+    coverPreview.src = "";
     cancelEditBtn.style.display = "none";
   } catch (err) {
     console.error("Error saving class: ", err);
@@ -75,19 +95,20 @@ classForm.addEventListener("submit", async (e) => {
 cancelEditBtn.addEventListener("click", () => {
   classForm.reset();
   document.getElementById("classId").value = "";
+  coverPreview.src = "";
   cancelEditBtn.style.display = "none";
 });
 
 // Render classes
 function renderClasses(docs) {
   classesList.innerHTML = "";
-  docs.forEach((docSnap) => {
+  docs.forEach(docSnap => {
     const data = docSnap.data();
     const div = document.createElement("div");
     div.classList.add("class-item");
-
     div.innerHTML = `
       <h3>${data.name} ${!data.visible ? "(Hidden)" : ""}</h3>
+      ${data.coverImage ? `<img src="${data.coverImage}" alt="Cover" width="150"/>` : ""}
       <p><strong>Date:</strong> ${data.date}</p>
       <p><strong>Time:</strong> ${data.time}</p>
       <p>${data.description}</p>
@@ -96,15 +117,13 @@ function renderClasses(docs) {
       <button data-id="${docSnap.id}" class="delete-btn">Delete</button>
       <button data-id="${docSnap.id}" class="toggle-btn">${data.visible ? "Hide" : "Show"}</button>
     `;
-
     classesList.appendChild(div);
   });
 
-  // Edit
-  document.querySelectorAll(".edit-btn").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
       const id = e.target.dataset.id;
-      const docSnap = docs.find((d) => d.id === id);
+      const docSnap = docs.find(d => d.id === id);
       const data = docSnap.data();
 
       document.getElementById("classId").value = id;
@@ -115,12 +134,15 @@ function renderClasses(docs) {
       document.getElementById("classRecipe").value = data.recipe || "";
       document.getElementById("classVisible").checked = data.visible ?? true;
 
+      await loadCoverOptions(data.name);
+      classCoverSelect.value = data.coverImage || "";
+      coverPreview.src = data.coverImage || "";
+
       cancelEditBtn.style.display = "inline-block";
     });
   });
 
-  // Delete
-  document.querySelectorAll(".delete-btn").forEach((btn) => {
+  document.querySelectorAll(".delete-btn").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const id = e.target.dataset.id;
       if (confirm("Delete this class?")) {
@@ -129,28 +151,20 @@ function renderClasses(docs) {
     });
   });
 
-  // Toggle Show/Hide
-  document.querySelectorAll(".toggle-btn").forEach((btn) => {
+  document.querySelectorAll(".toggle-btn").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       const id = e.target.dataset.id;
-      const docSnap = docs.find((d) => d.id === id);
+      const docSnap = docs.find(d => d.id === id);
       const visible = !docSnap.data().visible;
       await updateDoc(doc(db, "classes", id), { visible });
     });
   });
 }
 
-// Live listener
-onSnapshot(collection(db, "classes"), (snapshot) => {
-  renderClasses(snapshot.docs);
-});
+// Live listener for classes
+onSnapshot(collection(db, "classes"), snapshot => renderClasses(snapshot.docs));
 
-
-// DOM
-const galleryForm = document.getElementById("gallery-form");
-const galleryList = document.getElementById("gallery-list");
-
-// Upload gallery image
+// -------------------- Gallery --------------------
 galleryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -167,11 +181,9 @@ galleryForm.addEventListener("submit", async (e) => {
   const storageRef = ref(storage, `gallery/${fileName}`);
 
   try {
-    // Upload image
     await uploadBytes(storageRef, file);
     const imageUrl = await getDownloadURL(storageRef);
 
-    // Save metadata in Firestore
     await addDoc(collection(db, "gallery"), {
       eventName,
       date,
@@ -184,13 +196,18 @@ galleryForm.addEventListener("submit", async (e) => {
 
     alert("Image uploaded!");
     galleryForm.reset();
+
+    // Auto-refresh cover options if a class is being edited
+    const currentClassName = document.getElementById("className").value;
+    if (currentClassName) loadCoverOptions(currentClassName);
+
   } catch (err) {
     console.error("Error uploading image: ", err);
   }
 });
 
-// Render gallery images live
-onSnapshot(collection(db, "gallery"), (snapshot) => {
+// Live gallery rendering
+onSnapshot(collection(db, "gallery"), snapshot => {
   galleryList.innerHTML = "";
   snapshot.docs.forEach(docSnap => {
     const data = docSnap.data();
