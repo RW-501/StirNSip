@@ -435,12 +435,13 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     div.style.padding = "10px";
     div.style.marginBottom = "10px";
 
+
     div.innerHTML = `
       <img src="${data.url}" alt="${data.group || "Gallery"}" width="150"/>
       <p><strong>Group:</strong> ${data.group || "N/A"}</p>
       ${data.cover ? `<p style="color:green;"><em>Cover Image</em></p>` : ""}
       <button data-id="${id}" class="toggle-home">
-        ${data.showOnHome !== false ? "✅ Showing on Home" : "❌ Hidden from Home"}
+        ${!data.showOnHome || data.showOnHome === false ?  "❌ Hidden from Home" : "✅ Showing on Home" }
       </button>
       <button data-id="${id}" class="delete-gallery">Delete</button>
     `;
