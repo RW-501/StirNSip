@@ -16,6 +16,8 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstati
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
 import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
+   
+import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
 
 // Firebase Config
 const firebaseConfig = {
@@ -1113,17 +1115,18 @@ function setupAdminNav() {
   });
 }
 
+
+
 // Call this after DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   setupAdminNav();
-});
 
-    import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
-
-  // Initialize popup for all gallery images
+    // Initialize popup for all gallery images
   initImagePopup('img');
 
+});
 
+ 
 
 
   
