@@ -14,7 +14,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
-import { showToast } from 'https://rw-501.github.io/StirNSip/showToast.js';
+import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
 // Firebase Config
 const firebaseConfig = {

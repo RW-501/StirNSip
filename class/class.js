@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-import { showToast } from 'https://rw-501.github.io/StirNSip/showToast.js';
+import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
 // Firebase config
 const firebaseConfig = { 
