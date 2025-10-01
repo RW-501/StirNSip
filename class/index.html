@@ -334,6 +334,9 @@ async function loadMerch() {
       div.classList.add("merch-item", "animate-card");
       div.style.animationDelay = `${index * 0.1}s`; // stagger each card
 
+            
+      const isAvailable = data.available > 0 && data.link;
+
       // Build main image & thumbnails
       const mainImage = data.images && data.images.length > 0 ? data.images[0] : data.coverImage || '';
       const thumbsHtml = (data.images || []).map((img, i) => `
@@ -351,6 +354,13 @@ async function loadMerch() {
         <h3>${data.name}</h3>
         <p>${data.description || ''}</p>
         <p>Cost: $${data.cost?.toFixed(2) || 0}</p>
+               
+        <a href="${isAvailable ? data.link : '#'}" target="_blank" 
+           class="cta-btn" 
+           style="pointer-events:${isAvailable ? "auto" : "none"}; opacity:${isAvailable ? 1 : 0.5}">
+          ${isAvailable ? "Buy Now" : "Coming Soon"}
+        </a>
+
         <a href="${data.link || '#'}" target="_blank" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">Buy Now</a>
       `;
       merchList.appendChild(div);
