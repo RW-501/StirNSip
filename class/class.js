@@ -104,6 +104,7 @@ async function loadUpcomingClasses(currentClassName) {
       orderBy("date", "asc")
     );
     const snapshot = await getDocs(q);
+console.log("loadUpcomingClasses snapshot: ",snapshot);
 
     const filtered = snapshot.docs.filter(docSnap => docSnap.data().name !== currentClassName);
     if (!filtered.length) {
@@ -116,6 +117,7 @@ async function loadUpcomingClasses(currentClassName) {
       const data = docSnap.data();
       const div = document.createElement("div");
       div.classList.add("class-card");
+console.log("Classes data: ",data);
 
       div.innerHTML = `
         <h3>${data.name}</h3>
