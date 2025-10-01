@@ -206,12 +206,11 @@ select.priority {
 }
 
 .popup-content, .image-popup .popup-content {
-  background: #fff;
-  border-radius: 12px;
+ 
   padding: 1.5rem;
   max-width: 90%;
   max-height: 90%;
-  overflow-y: auto;
+
   position: relative;
 }
 
