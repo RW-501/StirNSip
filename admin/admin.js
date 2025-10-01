@@ -643,3 +643,26 @@ updateTemplateBtn.addEventListener("click", async () => {
     console.error("Error updating template:", err);
   }
 });
+
+
+const deleteTemplateBtn = document.getElementById("deleteTemplate");
+
+// Delete selected template
+deleteTemplateBtn.addEventListener("click", async () => {
+  const id = templateSelect.value;
+  if (!id) {
+    alert("Please select a template to delete.");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to delete this template?")) return;
+
+  try {
+    await deleteDoc(doc(db, "classTemplates", id));
+    alert("Template deleted!");
+    loadTemplates(); // refresh dropdown
+    templateSelect.value = "";
+  } catch (err) {
+    console.error("Error deleting template:", err);
+  }
+});
