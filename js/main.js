@@ -185,12 +185,10 @@ grouped[data.name].times.push(data.time);
 const classesQuery = query(
   collection(db, "classes"),
   where("visible", "==", true),
-  orderBy("dateTimes.0.date", "asc") // Use first date in array if you changed to multiple dates
+  orderBy("firstDate", "asc")
 );
 
-// Listen for changes
 onSnapshot(classesQuery, snapshot => renderClasses(snapshot.docs));
-
 
 
 

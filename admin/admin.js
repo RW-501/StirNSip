@@ -258,18 +258,18 @@ console.log("Date:", date);
 const times = [];
 document.querySelectorAll(".classTime").forEach(input => {
   if (input.value) {
-    console.log("Found time:", input.value);
+ //   console.log("Found time:", input.value);
     times.push(input.value);
   } else {
     console.log("Empty time input found");
   }
 });
 
-console.log("All times array:", times);
 
 // Build final structure
 const result = [{ date, times }];
-console.log("Result:", result);
+// assume `result = [{ date, times }]` from your builder
+const firstDate = result[0]?.date || null;
 
 const classData = {
   name,
@@ -285,8 +285,10 @@ const classData = {
   coverImage,
   secondLink,
   eventbriteLink,
-  dateTimes: result
+  dateTimes: result,
+  firstDate // <-- new field for ordering
 };
+
 
   try {
     if (id) {
