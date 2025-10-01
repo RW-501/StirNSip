@@ -171,6 +171,32 @@ const classesQuery = query(
 // Listen for changes
 onSnapshot(classesQuery, snapshot => renderClasses(snapshot.docs));
 
+
+
+
+
+const merchListHome = document.getElementById("merchList");
+
+onSnapshot(query(collection(db, "merch"), where("visible", "==", true)), snapshot => {
+  merchListHome.innerHTML = "";
+  snapshot.docs.forEach(docSnap => {
+    const m = docSnap.data();
+    const div = document.createElement("div");
+    div.className = "merch-card";
+    div.innerHTML = `
+      <img src="${m.coverImage || ''}" alt="${m.name}" style="max-width:150px;">
+      <h4>${m.name}</h4>
+      <p>${m.description}</p>
+      <p><strong>Cost:</strong> $${m.cost?.toFixed(2) || 0}</p>
+      <p>${m.available} in stock</p>
+      <a href="${m.link || '#'}" target="_blank" class="cta-btn">
+        ${m.link ? "Buy Now" : "Coming Soon"}
+      </a>
+    `;
+    merchListHome.appendChild(div);
+  });
+});
+
     // Initial site settings load
     loadSiteSettings();
 

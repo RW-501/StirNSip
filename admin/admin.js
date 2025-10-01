@@ -412,19 +412,20 @@ galleryForm.addEventListener("submit", async (e) => {
   galleryForm.reset();
   galleryInput.value = "";
 });
+
+
+
 // -------------------- Gallery Live Render + Cover Options --------------------
 onSnapshot(collection(db, "gallery"), snapshot => {
   galleryList.innerHTML = "";
-
-  // Reset cover image picker
-  const coverOptions = document.getElementById("classCover");
-  coverOptions.innerHTML = "";
+  classCoverSelect.innerHTML = "";
+  merchCoverOptions.innerHTML = "";
 
   snapshot.docs.forEach(docSnap => {
     const data = docSnap.data();
     const id = docSnap.id;
 
-    // Render gallery item
+    // --- Render Gallery Item ---
     const div = document.createElement("div");
     div.classList.add("gallery-item");
     div.style.border = "1px solid #ddd";
@@ -440,31 +441,44 @@ onSnapshot(collection(db, "gallery"), snapshot => {
       </button>
       <button data-id="${id}" class="delete-gallery">Delete</button>
     `;
-
     galleryList.appendChild(div);
 
-    // Add clickable option for cover selection (grid style)
-    const img = document.createElement("img");
-    img.src = data.url;
-    img.alt = data.group || "Gallery";
-    img.style.width = "100px";
-    img.style.margin = "5px";
-    img.style.cursor = "pointer";
-    img.style.border = "2px solid transparent";
+    // --- Cover selection for classes ---
+    const classImg = document.createElement("img");
+    classImg.src = data.url;
+    classImg.alt = data.group || "Gallery";
+    classImg.style.width = "100px";
+    classImg.style.margin = "5px";
+    classImg.style.cursor = "pointer";
+    classImg.style.border = "2px solid transparent";
 
-    img.addEventListener("click", () => {
+    classImg.addEventListener("click", () => {
       document.querySelectorAll("#classCover img").forEach(i => i.style.border = "2px solid transparent");
-      img.style.border = "2px solid blue";
-
+      classImg.style.border = "2px solid blue";
       coverPreview.src = data.url;
       classCoverSelect.value = data.url;
     });
+    classCoverSelect.appendChild(classImg);
 
-    coverOptions.appendChild(img);
+    // --- Cover selection for merch ---
+    const merchImg = document.createElement("img");
+    merchImg.src = data.url;
+    merchImg.alt = data.group || "Gallery";
+    merchImg.style.width = "80px";
+    merchImg.style.margin = "5px";
+    merchImg.style.cursor = "pointer";
+    merchImg.style.border = "2px solid transparent";
+
+    merchImg.addEventListener("click", () => {
+      document.querySelectorAll("#merchCoverOptions img").forEach(i => i.style.border = "2px solid transparent");
+      merchImg.style.border = "2px solid blue";
+      merchCoverPreview.src = data.url;
+    });
+    merchCoverOptions.appendChild(merchImg);
   });
 
   // --- Event Listeners ---
-  // Delete handler
+  // Delete gallery image
   document.querySelectorAll(".delete-gallery").forEach(btn => {
     btn.addEventListener("click", async () => {
       const docId = btn.dataset.id;
@@ -479,7 +493,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     });
   });
 
-  // Toggle home visibility handler
+  // Toggle show on home
   document.querySelectorAll(".toggle-home").forEach(btn => {
     btn.addEventListener("click", async () => {
       const docId = btn.dataset.id;
@@ -491,7 +505,6 @@ onSnapshot(collection(db, "gallery"), snapshot => {
 
         const current = snap.data().showOnHome !== false; // default true
         await updateDoc(docRef, { showOnHome: !current });
-
         showToast(`Image is now ${!current ? "visible" : "hidden"} on home page.`);
       } catch (err) {
         console.error("Error updating showOnHome:", err);
@@ -499,6 +512,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     });
   });
 });
+
 
 
 
@@ -685,3 +699,105 @@ deleteTemplateBtn.addEventListener("click", async () => {
   }
 });
 
+const merchForm = document.getElementById("merch-form");
+const merchList = document.getElementById("admin-merch-list");
+const merchCoverOptions = document.getElementById("merchCoverOptions");
+const merchCoverPreview = document.getElementById("merchCoverPreview");
+const cancelMerchEdit = document.getElementById("cancelMerchEdit");
+
+// Load merch items
+async function loadMerch() {
+  merchList.innerHTML = "<p>Loading merchandise...</p>";
+  try {
+    const q = query(collection(db, "merch"), orderBy("name", "asc"));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+      merchList.innerHTML = "<p>No merch added yet.</p>";
+      return;
+    }
+    
+    merchList.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const m = docSnap.data();
+      const div = document.createElement("div");
+      div.className = "merch-item";
+      div.innerHTML = `
+        <h4>${m.name}</h4>
+        <img src="${m.coverImage || ''}" style="max-width:100px;">
+        <p>${m.description}</p>
+        <p><strong>Cost:</strong> $${m.cost?.toFixed(2) || 0}</p>
+        <p><strong>Available:</strong> ${m.available}</p>
+        <p><strong>Link:</strong> ${m.link ? `<a href="${m.link}" target="_blank">Buy</a>` : "<em>Coming Soon</em>"}</p>
+        <p><strong>Visible:</strong> ${m.visible ? "Yes" : "No"}</p>
+        <button data-id="${docSnap.id}" class="edit-merch">Edit</button>
+        <button data-id="${docSnap.id}" class="delete-merch">Delete</button>
+      `;
+      merchList.appendChild(div);
+    });
+
+    // Edit / delete handlers
+    document.querySelectorAll(".edit-merch").forEach(btn => {
+      btn.addEventListener("click", () => editMerch(btn.dataset.id));
+    });
+    document.querySelectorAll(".delete-merch").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        if (!confirm("Delete this merch item?")) return;
+        await deleteDoc(doc(db, "merch", btn.dataset.id));
+        loadMerch();
+      });
+    });
+    
+  } catch (err) {
+    console.error(err);
+    merchList.innerHTML = "<p>Error loading merch.</p>";
+  }
+}
+
+// Save merch
+merchForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const id = document.getElementById("merchId").value;
+  const name = document.getElementById("merchName").value;
+  const description = document.getElementById("merchDescription").value;
+  const cost = parseFloat(document.getElementById("merchCost").value) || 0;
+  const available = parseInt(document.getElementById("merchAvailable").value) || 0;
+  const link = document.getElementById("merchLink").value || "";
+  const visible = document.getElementById("merchVisible").checked;
+  const coverImage = merchCoverPreview.src || "";
+
+  const merchData = { name, description, cost, available, link, visible, coverImage };
+  
+  try {
+    if (id) {
+      await updateDoc(doc(db, "merch", id), merchData);
+    } else {
+      await addDoc(collection(db, "merch"), merchData);
+    }
+    merchForm.reset();
+    merchCoverPreview.src = "";
+    loadMerch();
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+// Edit merch
+async function editMerch(id) {
+  const docSnap = await getDoc(doc(db, "merch", id));
+  if (!docSnap.exists()) return;
+  const m = docSnap.data();
+  document.getElementById("merchId").value = id;
+  document.getElementById("merchName").value = m.name || "";
+  document.getElementById("merchDescription").value = m.description || "";
+  document.getElementById("merchCost").value = m.cost || 0;
+  document.getElementById("merchAvailable").value = m.available || 0;
+  document.getElementById("merchLink").value = m.link || "";
+  document.getElementById("merchVisible").checked = m.visible || false;
+  merchCoverPreview.src = m.coverImage || "";
+}
+
+// Cancel edit
+cancelMerchEdit.addEventListener("click", () => {
+  merchForm.reset();
+  merchCoverPreview.src = "";
+});

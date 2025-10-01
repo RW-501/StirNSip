@@ -157,6 +157,46 @@
   <div id="gallery-list" style="display:flex; flex-wrap:wrap; gap:10px;"></div>
 </section>
 
+
+
+<section id="admin-merch-section">
+  <h2>Manage Merchandise</h2>
+  
+  <form id="merch-form">
+    <input type="hidden" id="merchId">
+    
+    <label for="merchName">Name:</label>
+    <input type="text" id="merchName" required>
+    
+    <label for="merchDescription">Description:</label>
+    <textarea id="merchDescription" rows="3"></textarea>
+    
+    <label for="merchCost">Cost ($):</label>
+    <input type="number" id="merchCost" step="0.01" min="0">
+    
+    <label for="merchAvailable">Available:</label>
+    <input type="number" id="merchAvailable" min="0">
+    
+    <label for="merchLink">Buy Link:</label>
+    <input type="url" id="merchLink" placeholder="https:// or leave empty for coming soon">
+    
+    <label for="merchVisible">Visible:</label>
+    <input type="checkbox" id="merchVisible" checked>
+    
+    <label>Image:</label>
+    <div id="merchCoverOptions"></div>
+    <img id="merchCoverPreview" style="max-width:150px; margin-top:5px;">
+    
+    <button type="submit">Save Merch</button>
+    <button type="button" id="cancelMerchEdit">Cancel</button>
+  </form>
+
+  <div id="admin-merch-list"></div>
+</section>
+
+
+
+
 </div>
 
 
