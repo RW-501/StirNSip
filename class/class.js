@@ -19,11 +19,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Helper: get query param from URL
-function getQueryParam(param) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(param);
-}
 
 // Get class ID
 const classId = new URLSearchParams(window.location.search).get("id");
@@ -60,6 +55,8 @@ async function loadClassDetails() {
     }
 
     const data = docSnap.data();
+console.log("data: ",data);
+
 
     classNameEl.textContent = data.name;
     classDescriptionEl.textContent = data.description;
