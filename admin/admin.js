@@ -804,67 +804,72 @@ cancelMerchEdit.addEventListener("click", () => {
 });
 
 
+// budgetPlanner.js
 
-import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, onSnapshot } from "firebase/firestore";
-import { db } from "./firebase.js"; // your Firebase config
-import { showToast } from "./toast.js"; // your toast module
+export async function initBudgetPlanner(options = {}) {
+  const budgetTableBody = document.querySelector("#budgetTable tbody");
+  const addBudgetItemBtn = document.getElementById("addBudgetItemBtn");
+  const budgetSearch = document.getElementById("budgetSearch");
+  const budgetFilterClass = document.getElementById("budgetFilterClass");
+  const notesPopup = document.getElementById("budgetNotesPopup");
+  const budgetNotesText = document.getElementById("budgetNotesText");
+  const saveBudgetNotesBtn = document.getElementById("saveBudgetNotesBtn");
+  const closeBudgetNotesBtn = document.getElementById("closeBudgetNotesBtn");
 
-const budgetTableBody = document.querySelector("#budgetTable tbody");
-const addBudgetItemBtn = document.getElementById("addBudgetItemBtn");
-const budgetSearch = document.getElementById("budgetSearch");
-const budgetFilterClass = document.getElementById("budgetFilterClass");
-const notesPopup = document.getElementById("budgetNotesPopup");
-const budgetNotesText = document.getElementById("budgetNotesText");
-const saveBudgetNotesBtn = document.getElementById("saveBudgetNotesBtn");
-const closeBudgetNotesBtn = document.getElementById("closeBudgetNotesBtn");
+  let currentNotesId = null;
+  let budgetData = [];
 
-let currentNotesId = null;
+  // Load classes into filter
+  async function loadClassFilter() {
+    budgetFilterClass.innerHTML = '<option value="">All Classes</option>';
+    const snapshot = await getDocs(collection(db, "classes"));
+    snapshot.forEach(docSnap => {
+      const cls = docSnap.data();
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = cls.name;
+      budgetFilterClass.appendChild(option);
+    });
+  }
 
-// Load classes into filter
-async function loadClassFilter() {
-  const snapshot = await getDocs(collection(db, "classes"));
-  snapshot.forEach(docSnap => {
-    const cls = docSnap.data();
-    const option = document.createElement("option");
-    option.value = docSnap.id;
-    option.textContent = cls.name;
-    budgetFilterClass.appendChild(option);
-  });
-}
-
-// Load budget items live
-function loadBudgetItems() {
-  onSnapshot(collection(db, "budgets"), snapshot => {
+  // Render table
+  function renderTable() {
+    const searchText = budgetSearch.value.toLowerCase();
+    const filterClass = budgetFilterClass.value;
     budgetTableBody.innerHTML = "";
+
     let totalEst = 0, totalActual = 0, totalTicket = 0, totalVenue = 0, totalProfit = 0;
 
-    snapshot.docs.forEach(docSnap => {
-      const data = docSnap.data();
-      const tr = document.createElement("tr");
+    budgetData.forEach(item => {
+      if (searchText && !item.item.toLowerCase().includes(searchText)) return;
+      if (filterClass && item.classId !== filterClass) return;
 
-      const profit = (data.ticketCost || 0) - ((data.actualCost || 0) + (data.venueCost || 0));
-      totalEst += data.estimatedCost || 0;
-      totalActual += data.actualCost || 0;
-      totalTicket += data.ticketCost || 0;
-      totalVenue += data.venueCost || 0;
+      const profit = (item.ticketCost || 0) - ((item.actualCost || 0) + (item.venueCost || 0));
+      totalEst += item.estimatedCost || 0;
+      totalActual += item.actualCost || 0;
+      totalTicket += item.ticketCost || 0;
+      totalVenue += item.venueCost || 0;
       totalProfit += profit;
 
+      const tr = document.createElement("tr");
+      tr.dataset.id = item.id;
+
       tr.innerHTML = `
-        <td>${data.className || "N/A"}</td>
-        <td><input type="checkbox" class="liveStatus" ${data.live ? "checked" : ""}></td>
-        <td contenteditable class="itemName">${data.item || ""}</td>
-        <td contenteditable class="estCost">${data.estimatedCost || 0}</td>
-        <td contenteditable class="actualCost">${data.actualCost || 0}</td>
-        <td contenteditable class="ticketCost">${data.ticketCost || 0}</td>
-        <td contenteditable class="venueCost">${data.venueCost || 0}</td>
+        <td>${item.className || "N/A"}</td>
+        <td><input type="checkbox" class="liveStatus" ${item.live ? "checked" : ""}></td>
+        <td contenteditable class="itemName">${item.item || ""}</td>
+        <td contenteditable class="estCost">${item.estimatedCost || 0}</td>
+        <td contenteditable class="actualCost">${item.actualCost || 0}</td>
+        <td contenteditable class="ticketCost">${item.ticketCost || 0}</td>
+        <td contenteditable class="venueCost">${item.venueCost || 0}</td>
         <td>${profit.toFixed(2)}</td>
-        <td>${(data.links || []).map(l => `<a href="${l}" target="_blank">Link</a>`).join("<br>")}</td>
-        <td>${(data.pictures || []).map(img => `<img src="${img}" width="50"/>`).join("")}</td>
+        <td class="linksCell">${(item.links || []).map(l=>`<a href="${l}" target="_blank">Link</a>`).join("<br>")} <button class="editLinks">Edit</button></td>
+        <td class="picsCell">${(item.pictures || []).map(img=>`<img src="${img}" width="50"/>`).join("")} <button class="editPics">Add</button></td>
         <td>
           <select class="priority">
-            <option ${data.priority==="High"?"selected":""}>High</option>
-            <option ${data.priority==="Medium"?"selected":""}>Medium</option>
-            <option ${data.priority==="Low"?"selected":""}>Low</option>
+            <option ${item.priority==="High"?"selected":""}>High</option>
+            <option ${item.priority==="Medium"?"selected":""}>Medium</option>
+            <option ${item.priority==="Low"?"selected":""}>Low</option>
           </select>
         </td>
         <td><button class="editNotes">Edit</button></td>
@@ -872,49 +877,46 @@ function loadBudgetItems() {
       `;
 
       // Event listeners
-      tr.querySelector(".liveStatus").addEventListener("change", async e => {
-        await updateDoc(doc(db, "budgets", docSnap.id), { live: e.target.checked });
+      tr.querySelector(".liveStatus")?.addEventListener("change", async e => {
+        await updateDoc(doc(db, "budgets", item.id), { live: e.target.checked });
         showToast("Live status updated");
       });
 
-      tr.querySelector(".itemName").addEventListener("blur", async e => {
-        await updateDoc(doc(db, "budgets", docSnap.id), { item: e.target.textContent });
+      ["itemName","estCost","actualCost","ticketCost","venueCost"].forEach(cls => {
+        tr.querySelector(`.${cls}`)?.addEventListener("blur", async e => {
+          let val = cls.includes("Cost") ? parseFloat(e.target.textContent) || 0 : e.target.textContent;
+          await updateDoc(doc(db, "budgets", item.id), { [cls==="itemName"?"item":cls==="estCost"?"estimatedCost":cls==="actualCost"?"actualCost":cls==="ticketCost"?"ticketCost":"venueCost"]: val });
+        });
       });
 
-      tr.querySelector(".estCost").addEventListener("blur", async e => {
-        const val = parseFloat(e.target.textContent) || 0;
-        await updateDoc(doc(db, "budgets", docSnap.id), { estimatedCost: val });
+      tr.querySelector(".priority")?.addEventListener("change", async e => {
+        await updateDoc(doc(db, "budgets", item.id), { priority: e.target.value });
       });
 
-      tr.querySelector(".actualCost").addEventListener("blur", async e => {
-        const val = parseFloat(e.target.textContent) || 0;
-        await updateDoc(doc(db, "budgets", docSnap.id), { actualCost: val });
-      });
-
-      tr.querySelector(".ticketCost").addEventListener("blur", async e => {
-        const val = parseFloat(e.target.textContent) || 0;
-        await updateDoc(doc(db, "budgets", docSnap.id), { ticketCost: val });
-      });
-
-      tr.querySelector(".venueCost").addEventListener("blur", async e => {
-        const val = parseFloat(e.target.textContent) || 0;
-        await updateDoc(doc(db, "budgets", docSnap.id), { venueCost: val });
-      });
-
-      tr.querySelector(".priority").addEventListener("change", async e => {
-        await updateDoc(doc(db, "budgets", docSnap.id), { priority: e.target.value });
-      });
-
-      tr.querySelector(".editNotes").addEventListener("click", () => {
-        currentNotesId = docSnap.id;
-        budgetNotesText.value = data.notes || "";
+      tr.querySelector(".editNotes")?.addEventListener("click", () => {
+        currentNotesId = item.id;
+        budgetNotesText.value = item.notes || "";
         notesPopup.classList.remove("hidden");
       });
 
-      tr.querySelector(".deleteItem").addEventListener("click", async () => {
+      tr.querySelector(".deleteItem")?.addEventListener("click", async () => {
         if (!confirm("Delete this item?")) return;
-        await deleteDoc(doc(db, "budgets", docSnap.id));
+        await deleteDoc(doc(db, "budgets", item.id));
         showToast("Item deleted!");
+      });
+
+// Replace your previous editPics listener:
+tr.querySelector(".editPics")?.addEventListener("click", () => openGalleryPicker(item.id));
+
+
+
+      tr.querySelector(".editPics")?.addEventListener("click", () => {
+        const url = prompt("Add image URL:");
+        if (!url) return;
+        item.pictures = item.pictures || [];
+        item.pictures.push(url);
+        updateDoc(doc(db, "budgets", item.id), { pictures: item.pictures });
+        showToast("Picture added!");
       });
 
       budgetTableBody.appendChild(tr);
@@ -926,46 +928,157 @@ function loadBudgetItems() {
     document.getElementById("totalTicketCost").textContent = totalTicket.toFixed(2);
     document.getElementById("totalVenueCost").textContent = totalVenue.toFixed(2);
     document.getElementById("totalProfit").textContent = totalProfit.toFixed(2);
+  }
+
+  // Notes popup
+  saveBudgetNotesBtn.addEventListener("click", async () => {
+    if (!currentNotesId) return;
+    await updateDoc(doc(db, "budgets", currentNotesId), { notes: budgetNotesText.value });
+    showToast("Notes saved");
+    notesPopup.classList.add("hidden");
   });
+  closeBudgetNotesBtn.addEventListener("click", () => notesPopup.classList.add("hidden"));
+
+  // Add new budget item
+  addBudgetItemBtn.addEventListener("click", async () => {
+    const newItem = {
+      className: "",
+      live: false,
+      item: "",
+      estimatedCost: 0,
+      actualCost: 0,
+      ticketCost: 0,
+      venueCost: 0,
+      links: [],
+      pictures: [],
+      priority: "Medium",
+      notes: ""
+    };
+    const docRef = await addDoc(collection(db, "budgets"), newItem);
+    newItem.id = docRef.id;
+    budgetData.push(newItem);
+    renderTable();
+    showToast("Budget item added");
+  });
+
+  // Search & filter events
+  budgetSearch.addEventListener("input", renderTable);
+  budgetFilterClass.addEventListener("change", renderTable);
+
+  // Sort columns
+  document.querySelectorAll("#budgetTable th").forEach((th, idx) => {
+    th.style.cursor = "pointer";
+    th.addEventListener("click", () => {
+      const keyMap = ["className","live","item","estimatedCost","actualCost","ticketCost","venueCost","profit","links","pictures","priority","notes"];
+      const key = keyMap[idx];
+      budgetData.sort((a,b) => {
+        if(key==="profit") {
+          const pa = (a.ticketCost||0) - ((a.actualCost||0)+(a.venueCost||0));
+          const pb = (b.ticketCost||0) - ((b.actualCost||0)+(b.venueCost||0));
+          return pa - pb;
+        }
+        return (a[key] || "").toString().localeCompare((b[key] || "").toString());
+      });
+      renderTable();
+    });
+  });
+
+  // Export CSV
+  function exportCSV() {
+    let csv = "Class,Live,Item,EstCost,ActualCost,Ticket,Venue,Profit,Links,Pictures,Priority,Notes\n";
+    budgetData.forEach(item => {
+      const profit = (item.ticketCost||0) - ((item.actualCost||0)+(item.venueCost||0));
+      csv += `"${item.className || ""}",${item.live}, "${item.item || ""}",${item.estimatedCost || 0},${item.actualCost || 0},${item.ticketCost || 0},${item.venueCost || 0},${profit}, "${(item.links||[]).join("|")}","${(item.pictures||[]).join("|")}", "${item.priority}", "${item.notes || ""}"\n`;
+    });
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "budget.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Export PDF (using jsPDF if loaded on page)
+  function exportPDF() {
+    if (typeof jsPDF === "undefined") {
+      alert("jsPDF not loaded");
+      return;
+    }
+    const doc = new jsPDF();
+    let y = 10;
+    budgetData.forEach(item => {
+      const profit = (item.ticketCost||0) - ((item.actualCost||0)+(item.venueCost||0));
+      doc.text(`Class: ${item.className || ""}`, 10, y); y+=6;
+      doc.text(`Item: ${item.item || ""}`, 10, y); y+=6;
+      doc.text(`EstCost: ${item.estimatedCost || 0} | Actual: ${item.actualCost || 0} | Ticket: ${item.ticketCost || 0} | Venue: ${item.venueCost || 0} | Profit: ${profit}`, 10, y); y+=8;
+      doc.text(`Links: ${(item.links||[]).join(", ")}`, 10, y); y+=6;
+      doc.text(`Notes: ${item.notes || ""}`, 10, y); y+=10;
+      if(y>280){doc.addPage();y=10;}
+    });
+    doc.save("budget.pdf");
+  }
+
+  // Listen for export events
+  document.getElementById("exportCSVBtn")?.addEventListener("click", exportCSV);
+  document.getElementById("exportPDFBtn")?.addEventListener("click", exportPDF);
+
+  // Firebase live listener
+  onSnapshot(collection(db, "budgets"), snapshot => {
+    budgetData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+    renderTable();
+  });
+
+  await loadClassFilter();
 }
 
-// Notes popup buttons
-saveBudgetNotesBtn.addEventListener("click", async () => {
-  if (!currentNotesId) return;
-  await updateDoc(doc(db, "budgets", currentNotesId), { notes: budgetNotesText.value });
-  showToast("Notes saved");
-  notesPopup.classList.add("hidden");
-});
+// Assuming you have a Firebase collection "gallery" with images
+async function openGalleryPicker(itemId) {
+  // Fetch gallery images
+  const snapshot = await getDocs(collection(db, "gallery"));
+  const images = snapshot.docs.map(docSnap => ({ id: docSnap.id, url: docSnap.data().url }));
 
-closeBudgetNotesBtn.addEventListener("click", () => {
-  notesPopup.classList.add("hidden");
-});
+  // Create a simple picker popup
+  const picker = document.createElement("div");
+  picker.className = "galleryPickerPopup";
+  picker.style.position = "fixed";
+  picker.style.top = "50%";
+  picker.style.left = "50%";
+  picker.style.transform = "translate(-50%, -50%)";
+  picker.style.background = "#fff";
+  picker.style.padding = "20px";
+  picker.style.boxShadow = "0 2px 10px rgba(0,0,0,0.3)";
+  picker.style.zIndex = "9999";
+  picker.style.maxHeight = "80vh";
+  picker.style.overflowY = "auto";
 
-// Add new budget item
-addBudgetItemBtn.addEventListener("click", async () => {
-  const newItem = {
-    className: "",
-    live: false,
-    item: "",
-    estimatedCost: 0,
-    actualCost: 0,
-    ticketCost: 0,
-    venueCost: 0,
-    links: [],
-    pictures: [],
-    priority: "Medium",
-    notes: ""
-  };
-  await addDoc(collection(db, "budgets"), newItem);
-  showToast("Budget item added");
-});
+  picker.innerHTML = `<h3>Select Images</h3><div class="pickerGrid" style="display:grid; grid-template-columns:repeat(auto-fill, 80px); gap:10px;"></div><button id="closePicker">Close</button>`;
+  const grid = picker.querySelector(".pickerGrid");
+  images.forEach(img => {
+    const imgEl = document.createElement("img");
+    imgEl.src = img.url;
+    imgEl.style.width = "70px";
+    imgEl.style.height = "70px";
+    imgEl.style.cursor = "pointer";
+    imgEl.addEventListener("click", async () => {
+      // Add to budget item
+      const budgetDoc = doc(db, "budgets", itemId);
+      const itemSnap = budgetData.find(b => b.id === itemId);
+      itemSnap.pictures = itemSnap.pictures || [];
+      if (!itemSnap.pictures.includes(img.url)) itemSnap.pictures.push(img.url);
+      await updateDoc(budgetDoc, { pictures: itemSnap.pictures });
+      showToast("Image added!");
+      picker.remove();
+    });
+    grid.appendChild(imgEl);
+  });
 
-// Initialize
-loadClassFilter();
-loadBudgetItems();
+  document.body.appendChild(picker);
+  picker.querySelector("#closePicker").addEventListener("click", () => picker.remove());
+}
 
 
-
+initBudgetPlanner();
 
 
 function setupAdminNav() {
