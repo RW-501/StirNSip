@@ -27,6 +27,74 @@
     .class-card:hover, .merch-item:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.1); }
     .class-card h3, .merch-item p { margin:0.5rem 0; }
     footer { text-align:center; padding:1.5rem 0; background:#333; color:#fff; margin-top:2rem; }
+
+    .class-card img, .merch-item img { transition:0.3s; }
+.class-card:hover img, .merch-item:hover img { transform:scale(1.05); }
+.class-card h3, .merch-item h3 { font-size:1.2rem; margin:0.5rem 0; }
+.class-card p, .merch-item p { font-size:0.95rem; color:#555; }
+
+/* Featured badge */
+.featured-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: #ff5722;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.2rem 0.5rem;
+  border-radius: 5px;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+/* Card hover overlay */
+.card-overlay {
+  position: absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: rgba(0,0,0,0.5);
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  transition:0.3s;
+  border-radius:10px;
+  text-align:center;
+  padding:1rem;
+}
+
+.class-card:hover .card-overlay,
+.merch-item:hover .card-overlay {
+  opacity:1;
+}
+
+.class-card, .merch-item {
+  position: relative; /* for badge and overlay */
+  overflow: hidden;
+}
+
+/* Fade-up animation for cards */
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-card {
+  opacity: 0; /* start hidden */
+  animation: fadeUp 0.6s forwards;
+}
+
   </style>
 </head>
 <body>
@@ -165,7 +233,68 @@
       } catch(err){ console.error(err); elements.classNameEl.textContent="Error loading class"; }
     }
 
-    loadClassDetails();
+ 
+    
+    // --- LOAD UPCOMING CLASSES ---
+async function loadUpcomingClasses() {
+  const classesList = document.getElementById("classesList");
+  try {
+    const q = query(collection(db, "classes"), orderBy("firstDate", "asc"), where("active", "==", true));
+    const snapshot = await getDocs(q);
+snapshot.forEach((docSnap, index) => {
+  const data = docSnap.data();
+  const div = document.createElement("div");
+  div.classList.add("class-card", "animate-card");
+  div.style.animationDelay = `${index * 0.1}s`; // stagger each card
+  div.innerHTML = `
+    ${data.featured ? '<div class="featured-badge">Featured</div>' : ''}
+    <img src="${data.coverImage || ''}" alt="${data.name}" style="width:100%;border-radius:10px;object-fit:cover;height:160px;">
+    <div class="card-overlay">
+      <p>${data.description?.slice(0, 100) || ''}...</p>
+    </div>
+    <h3>${data.name}</h3>
+    <p>${formatDate(data.firstDate)} | ${data.time || 'TBD'}</p>
+    <p>Price: $${data.singlesCost?.toFixed(2) || 0}</p>
+    <a href="/class.html?id=${docSnap.id}" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">View Details</a>
+  `;
+  classesList.appendChild(div);
+});
+
+  } catch(err){ console.error(err); showToast("Error loading classes"); }
+}
+
+// --- LOAD MERCH ---
+async function loadMerch() {
+  const merchList = document.getElementById("merchList");
+  try {
+    const snapshot = await getDocs(collection(db, "merch"));
+snapshot.forEach((docSnap, index) => {
+  const data = docSnap.data();
+  const div = document.createElement("div");
+  div.classList.add("merch-item", "animate-card");
+  div.style.animationDelay = `${index * 0.1}s`; // stagger each card
+  div.innerHTML = `
+    ${data.featured ? '<div class="featured-badge">Featured</div>' : ''}
+    <img src="${data.image || ''}" alt="${data.name}" style="width:100%;border-radius:10px;object-fit:cover;height:160px;">
+    <div class="card-overlay">
+      <p>${data.description?.slice(0, 100) || ''}...</p>
+    </div>
+    <h3>${data.name}</h3>
+    <p>${data.description || ''}</p>
+    <p>Price: $${data.price?.toFixed(2) || 0}</p>
+    <a href="${data.link || '#'}" target="_blank" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">Buy Now</a>
+  `;
+  merchList.appendChild(div);
+});
+
+  } catch(err){ console.error(err); showToast("Error loading merch"); }
+}
+
+// Call them after class details
+loadClassDetails();
+loadUpcomingClasses();
+loadMerch();
+
   </script>
 </body>
 </html>
