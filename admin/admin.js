@@ -246,10 +246,11 @@ classForm.addEventListener("submit", async (e) => {
   const vibe = document.getElementById("classVibe").value;
   const coverImage = classCoverSelect.value;
 
+  const date = group.querySelector(".classDate").value;
+
   // Collect multiple dates/times
   const dateTimes = [];
   document.querySelectorAll(".date-time-group").forEach(group => {
-    const date = group.querySelector(".classDate").value;
     const time = group.querySelector(".classTime").value;
     if (date && time) dateTimes.push({ date, time });
   });
