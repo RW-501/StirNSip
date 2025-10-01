@@ -55,7 +55,6 @@ async function loadClassDetails() {
     }
 
     const data = docSnap.data();
-console.log("data: ",data);
 
 
     classNameEl.textContent = data.name;
@@ -145,10 +144,13 @@ async function loadMerch() {
       merchList.innerHTML = "<p>No merch available yet.</p>";
       return;
     }
+console.log("snapshot: ",snapshot);
 
     merchList.innerHTML = "";
     snapshot.docs.forEach(docSnap => {
       const item = docSnap.data();
+      console.log("data Mearch item: ",item);
+
       const div = document.createElement("div");
       div.classList.add("merch-item");
       div.innerHTML = `
