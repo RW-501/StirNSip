@@ -157,7 +157,7 @@ docs.forEach(docSnap => {
     };
   }
 
-  (data.dateTimes || []).forEach(dt => {
+  (data.dateTimes).forEach(dt => {
     grouped[data.name].dateTimes.push(dt);
   });
 });
