@@ -248,14 +248,25 @@ autoProcessing(classForm, "Saving...");
   const vibe = document.getElementById("classVibe").value;
   const coverImage = classCoverSelect.value;
 
-  const date = group.querySelector(".classDate").value;
 
   // Collect multiple dates/times
-  const dateTimes = [];
-  document.querySelectorAll(".date-time-group").forEach(group => {
-    const time = group.querySelector(".classTime").value;
-    if (date && time) dateTimes.push({ date, time });
-  });
+const dateTimes = {};
+
+document.querySelectorAll(".date-time-group").forEach(group => {
+  const date = group.querySelector(".classDate").value;
+  const time = group.querySelector(".classTime").value;
+
+  if (date && time) {
+    if (!dateTimes[date]) {
+      dateTimes[date] = []; // create an array for this date
+    }
+    dateTimes[date].push(time);
+  }
+});
+
+// Convert to array of objects if you prefer
+const result = Object.entries(dateTimes).map(([date, times]) => ({ date, times }));
+
 
   const classData = {
     name,
@@ -271,7 +282,7 @@ autoProcessing(classForm, "Saving...");
     coverImage,
     secondLink,
     eventbriteLink,
-    dateTimes
+    dateTimes: result
   };
 
   try {
