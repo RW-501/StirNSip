@@ -1199,3 +1199,6 @@ export function initContactAdmin() {
     showToast("Error loading submissions");
   });
 }
+
+
+initContactAdmin();
