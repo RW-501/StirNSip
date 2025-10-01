@@ -586,3 +586,25 @@ footer {
     max-width: 90%;
   }
 }
+
+@media (max-width: 600px) {
+  #heroSection {
+
+  
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    padding: .5rem !important;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    min-height: 40vh;
+
+}
+section {
+    padding: .5rem;
+    min-height: 40vh;
+}
+
+  }
+
+}
