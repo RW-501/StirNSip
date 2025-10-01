@@ -249,19 +249,17 @@ autoProcessing(classForm, "Saving...");
   const coverImage = classCoverSelect.value;
 
 
-  // Collect multiple dates/times
-// Get the single date
-const date = document.querySelector(".classDate").value;
+const date = document.querySelector(".classDate").value; // one date for all
 
-// Collect all times
 const times = [];
 document.querySelectorAll(".classTime").forEach(input => {
-  const time = input.value;
-  if (time) times.push(time);
+  if (input.value) {
+    times.push(input.value);
+  }
 });
 
-// Structure it consistently
-const dateTimes = [{ date, times }];
+// Build final structure
+const result = [{ date, times }];
 
 const classData = {
   name,
@@ -277,7 +275,7 @@ const classData = {
   coverImage,
   secondLink,
   eventbriteLink,
-  dateTimes
+  dateTimes: result
 };
 
   try {
