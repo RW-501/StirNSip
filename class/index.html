@@ -200,13 +200,16 @@ const firebaseConfig = {
       const options = { weekday:"short", month:"short", day:"numeric", year:"numeric" };
       return new Date(dateStr).toLocaleDateString("en-US", options);
     }
+
+    
     function formatTime(timeStr) {
-      // optional: format "14:00" to "2:00 PM"
-      const [h,m] = timeStr.split(":").map(Number);
-      const date = new Date();
-      date.setHours(h, m);
-      return date.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
-    }
+  if (!timeStr) return "TBD"; // return if undefined
+  const [h,m] = timeStr.split(":").map(Number);
+  const date = new Date();
+  date.setHours(h, m);
+  return date.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+}
+
 
     async function loadClassDetails() {
       if (!classId) { elements.classNameEl.textContent="Class not found"; return; }
@@ -219,13 +222,16 @@ const firebaseConfig = {
         elements.coverImageEl.src = data.coverImage || "";
         elements.coverImageEl.alt = data.name;
 
-        if (data.dateTimes && data.dateTimes.length) {
-          elements.classDateEl.textContent = data.dateTimes.map(dt=>formatDate(dt.date)).join(", ");
-          elements.classTimeEl.textContent = data.dateTimes.map(dt=>formatTime(dt.time)).join(", ");
-        } else {
-          elements.classDateEl.textContent = formatDate(data.firstDate);
-          elements.classTimeEl.textContent = "TBD";
-        }
+if (data.dateTimes && data.dateTimes.length) {
+  elements.classDateEl.textContent = data.dateTimes.map(dt => formatDate(dt.date)).join(", ");
+  elements.classTimeEl.textContent = data.dateTimes
+    .map(dt => dt.time ? formatTime(dt.time) : "TBD")
+    .join(", ");
+} else {
+  elements.classDateEl.textContent = formatDate(data.firstDate);
+  elements.classTimeEl.textContent = "TBD";
+}
+
 
         elements.classDescriptionEl.textContent = data.description;
         elements.classVibeEl.textContent = `Vibe: ${data.vibe || "N/A"}`;
