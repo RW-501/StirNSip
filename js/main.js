@@ -191,19 +191,23 @@ Object.entries(grouped).forEach(([name, info]) => {
   div.style.display = "flex";
   div.style.flexDirection = "column";
 
-  // Build times grouped by date
-  const timesHtml = info.dateTimes
-    .map(dt => `<span class="time-badge" style="
-      background:${vibeColor(info.vibe)}22; 
-      color:${vibeColor(info.vibe)}; 
-      padding:4px 8px; 
-      border-radius:4px; 
-      font-size:0.85em;
-      font-weight:500;
-      margin:2px;
-      display:inline-block;
-    ">${dt.date} @ ${dt.time}</span>`)
-    .join(" ");
+const timesHtml = info.dateTimes
+  .map(dt => {
+    // Map each time for this date
+    return dt.times.map(t => `
+      <span class="time-badge" style="
+        background: ${vibeColor(info.vibe)}22;
+        color: ${vibeColor(info.vibe)};
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85em;
+        font-weight: 500;
+        margin: 2px;
+        display: inline-block;
+      ">${dt.date} @ ${t}</span>
+    `).join(""); // join times for the same date
+  })
+  .join(""); // join all dates
 
   div.innerHTML = `
     <div class="card-image" style="
@@ -219,7 +223,7 @@ Object.entries(grouped).forEach(([name, info]) => {
         <p style="margin:0 0 10px 0;">Cost: $${info.singlesCost} (single) | $${info.couplesCost} (couple)</p>
         <div class="time-badges" style="display:flex; flex-wrap:wrap;">${timesHtml}</div>
       </div>
-      <a href="class.html?id=${info.id}" class="cta-btn" style="
+      <a href="class/index.html?id=${info.id}" class="cta-btn" style="
         display:inline-block; 
         padding:10px 20px; 
         background:${vibeColor(info.vibe)}; 
