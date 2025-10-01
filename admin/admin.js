@@ -444,6 +444,11 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     option.textContent = `${data.group || "Gallery"} - ${new Date(data.createdAt?.toDate?.() || Date.now()).toLocaleDateString()}`;
     classCoverSelect.appendChild(option);
   });
+  
+// Update preview when dropdown changes
+classCoverSelect.addEventListener("change", (e) => {
+  coverPreview.src = e.target.value || "";
+});
 
   // Delete handler
   document.querySelectorAll(".delete-gallery").forEach(btn => {
