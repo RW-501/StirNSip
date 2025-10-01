@@ -201,6 +201,9 @@
     import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
     import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
+        
+    import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
+
     // Firebase config
 const firebaseConfig = { 
   apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
@@ -334,6 +337,10 @@ async function loadUpcomingClasses() {
       classesList.appendChild(div);
     });
 
+    
+  // Initialize popup for all gallery images
+  initImagePopup('img');
+
   } catch (err) {
     console.error(err);
     showToast("Error loading classes");
@@ -397,6 +404,10 @@ async function loadMerch() {
       });
     });
 
+    
+  // Initialize popup for all gallery images
+  initImagePopup('img');
+  
   } catch(err) { 
     console.error(err); 
     showToast("Error loading merch"); 
