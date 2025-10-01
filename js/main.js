@@ -191,9 +191,21 @@ Object.entries(grouped).forEach(([name, info]) => {
   div.style.display = "flex";
   div.style.flexDirection = "column";
 
+function formatTime24to12(time24) {
+  const [hourStr, minute] = time24.split(":");
+  let hour = parseInt(hourStr, 10);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  hour = hour % 12 || 12; // convert 0 => 12, 13 => 1, etc.
+  return `${hour}:${minute} ${ampm}`;
+}
+
 const timesHtml = info.dateTimes
   .map(dt => {
-    // Map each time for this date
+    const formattedDate = new Date(dt.date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
     return dt.times.map(t => `
       <span class="time-badge" style="
         background: ${vibeColor(info.vibe)}22;
@@ -204,10 +216,10 @@ const timesHtml = info.dateTimes
         font-weight: 500;
         margin: 2px;
         display: inline-block;
-      ">${dt.date} @ ${t}</span>
-    `).join(""); // join times for the same date
+      ">${formattedDate} @ ${formatTime24to12(t)}</span>
+    `).join("");
   })
-  .join(""); // join all dates
+  .join("");
 
   div.innerHTML = `
     <div class="card-image" style="
