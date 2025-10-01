@@ -168,10 +168,13 @@ async function loadClasses() {
       div.className = "class-item";
 
       // Build multiple date/times
-      let dateTimesHTML = "";
-      if (Array.isArray(cls.dateTimes)) {
-        dateTimesHTML = cls.dateTimes.map(dt => `<li>${dt.date} @ ${dt.time}</li>`).join("");
-      }
+let dateTimesHTML = "";
+if (Array.isArray(cls.dateTimes)) {
+  dateTimesHTML = cls.dateTimes.map(dt => {
+    return dt.times.map(t => `<li>${dt.date} @ ${t}</li>`).join("");
+  }).join("");
+}
+
 
       div.innerHTML = `
         <h4>${cls.name}</h4>

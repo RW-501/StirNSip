@@ -151,10 +151,11 @@ function renderClasses(docs) {
         times: []
       };
     }
-    grouped[data.name].times.push({
-      date: data.date,
-      time: data.time
-    });
+if (!grouped[data.name]) {
+  grouped[data.name] = { date: data.date, times: [] };
+}
+grouped[data.name].times.push(data.time);
+
   });
 
   // Render grouped cards
