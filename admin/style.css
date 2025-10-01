@@ -20,7 +20,7 @@ main {
     max-width: 1400px;
     margin: 0 auto;
     text-align: justify;
-    width: min-content;
+    width: 100%;
     place-self: center;
 }
 
