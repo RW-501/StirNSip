@@ -49,22 +49,25 @@ async function loadSiteSettings() {
 // -------------------- Gallery Live Render --------------------
 onSnapshot(collection(db, "gallery"), snapshot => {
   galleryList.innerHTML = "";
+
   snapshot.docs.forEach(docSnap => {
     const data = docSnap.data();
     const id = docSnap.id;
 
+    // Only show if showOnHome is true OR not defined
+    if (data.showOnHome === false) return;
+
     const div = document.createElement("div");
     div.classList.add("gallery-item");
     div.style.border = "1px solid #ddd";
-   // div.style.padding = "5px";
+    // div.style.padding = "5px";
 
     div.innerHTML = `
-      <img src="${data.url}" alt="${data.group}" width="150"/>
+      <img src="${data.url}" alt="${data.group || "Gallery"}" width="150"/>
     `;
 
     galleryList.appendChild(div);
   });
-
 });
 
 

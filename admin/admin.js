@@ -410,40 +410,38 @@ galleryForm.addEventListener("submit", async (e) => {
   galleryForm.reset();
   galleryInput.value = "";
 });
-
 // -------------------- Gallery Live Render + Cover Options --------------------
 onSnapshot(collection(db, "gallery"), snapshot => {
   galleryList.innerHTML = "";
-  
-  // Clear and reset cover select
-  classCoverSelect.innerHTML = `<option value="">-- Select Cover --</option>`;
+
+  // Reset cover image picker
+  const coverOptions = document.getElementById("classCover");
+  coverOptions.innerHTML = "";
 
   snapshot.docs.forEach(docSnap => {
     const data = docSnap.data();
     const id = docSnap.id;
 
-    // Render gallery items
+    // Render gallery item
     const div = document.createElement("div");
     div.classList.add("gallery-item");
     div.style.border = "1px solid #ddd";
-    div.style.padding = "5px";
+    div.style.padding = "10px";
     div.style.marginBottom = "10px";
 
     div.innerHTML = `
       <img src="${data.url}" alt="${data.group || "Gallery"}" width="150"/>
       <p><strong>Group:</strong> ${data.group || "N/A"}</p>
       ${data.cover ? `<p style="color:green;"><em>Cover Image</em></p>` : ""}
+      <button data-id="${id}" class="toggle-home">
+        ${data.showOnHome !== false ? "✅ Showing on Home" : "❌ Hidden from Home"}
+      </button>
       <button data-id="${id}" class="delete-gallery">Delete</button>
     `;
 
     galleryList.appendChild(div);
 
-    // Add image to cover select
-  const coverOptions = document.getElementById("classCover");
-  coverOptions.innerHTML = "";
-
-  snapshot.docs.forEach(docSnap => {
-    const data = docSnap.data();
+    // Add clickable option for cover selection (grid style)
     const img = document.createElement("img");
     img.src = data.url;
     img.alt = data.group || "Gallery";
@@ -453,23 +451,17 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     img.style.border = "2px solid transparent";
 
     img.addEventListener("click", () => {
-      // Highlight selection
-      document.querySelectorAll("#coverOptions img").forEach(i => i.style.border = "2px solid transparent");
+      document.querySelectorAll("#classCover img").forEach(i => i.style.border = "2px solid transparent");
       img.style.border = "2px solid blue";
 
       coverPreview.src = data.url;
-      classCoverSelect.value = data.url; // optional if you still want the select value
+      classCoverSelect.value = data.url;
     });
 
     coverOptions.appendChild(img);
   });
-});
-  
-// Update preview when dropdown changes
-classCoverSelect.addEventListener("change", (e) => {
-  coverPreview.src = e.target.value || "";
-});
 
+  // --- Event Listeners ---
   // Delete handler
   document.querySelectorAll(".delete-gallery").forEach(btn => {
     btn.addEventListener("click", async () => {
@@ -484,7 +476,26 @@ classCoverSelect.addEventListener("change", (e) => {
       }
     });
   });
-});
 
+  // Toggle home visibility handler
+  document.querySelectorAll(".toggle-home").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const docId = btn.dataset.id;
+      const docRef = doc(db, "gallery", docId);
+
+      try {
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) return;
+
+        const current = snap.data().showOnHome !== false; // default true
+        await updateDoc(docRef, { showOnHome: !current });
+
+        alert(`Image is now ${!current ? "visible" : "hidden"} on home page.`);
+      } catch (err) {
+        console.error("Error updating showOnHome:", err);
+      }
+    });
+  });
+});
 
 
