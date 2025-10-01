@@ -212,3 +212,52 @@ onSnapshot(query(collection(db, "merch"), where("visible", "==", true)), snapsho
 
   // Initialize popup for all gallery images
   initImagePopup('img');
+
+
+
+const contactForm = document.getElementById("contact-form");
+const subjectSelect = document.getElementById("subject");
+const eventFields = document.getElementById("eventFields");
+
+// Function to create input fields
+function createEventFields() {
+  eventFields.innerHTML = `
+    <input type="number" name="guests" placeholder="Number of Guests" min="1" required>
+    <input type="text" name="foodType" placeholder="Type of Food / Cuisine" required>
+    <input type="date" name="eventDate" required>
+    <input type="time" name="eventTime" required>
+    <input type="text" name="location" placeholder="Event Location" required>
+    <input type="text" name="contactMethod" placeholder="Preferred Contact Method (Phone/Email)" required>
+  `;
+}
+
+// Show/hide dynamic fields based on subject
+subjectSelect.addEventListener("change", (e) => {
+  if (e.target.value === "event") {
+    eventFields.style.display = "block";
+    createEventFields();
+  } else {
+    eventFields.style.display = "none";
+    eventFields.innerHTML = "";
+  }
+});
+
+// Form submission
+contactForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  
+  const formData = new FormData(contactForm);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    await addDoc(collection(db, "contactSubmissions"), data);
+    showToast("Thank you! We received your submission.");
+  } catch (err) {
+    console.error("Error saving contact submission:", err);
+    showToast("Oops! Something went wrong, please try again.");
+  }
+
+  contactForm.reset();
+  eventFields.style.display = "none";
+  eventFields.innerHTML = "";
+});
