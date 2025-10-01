@@ -5,96 +5,167 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Class Details | Stir & Sip</title>
   <link rel="stylesheet" href="https://rw-501.github.io/StirNSip/style.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; margin:0; padding:0; line-height:1.6; background:#f9f9f9; color:#333; }
+    .sticky-header { position: sticky; top:0; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1); z-index:1000; }
+    .nav-container { display:flex; justify-content:space-between; align-items:center; padding:1rem 2rem; }
+    .nav-container a.logo { font-size:1.8rem; font-weight:bold; color:#ff5722; text-decoration:none; }
+    .cta-btn { display:inline-block; margin:0.5rem 0.25rem; padding:0.6rem 1.2rem; background:#ff5722; color:#fff; border-radius:8px; text-decoration:none; transition:0.2s; }
+    .cta-btn:hover { background:#e64a19; }
+    .secondary-btn { background:#ffa726; color:#fff; }
+    .secondary-btn:hover { background:#fb8c00; }
+    .class-detail { max-width:900px; margin:2rem auto; background:#fff; padding:2rem; border-radius:12px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
+    .class-title { font-size:2rem; margin-bottom:1rem; text-align:center; }
+    .cover-image { width:100%; height:auto; border-radius:12px; margin-bottom:1rem; }
+    .class-meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+    .meta-item { background:#f4f4f4; padding:0.6rem 1rem; border-radius:8px; }
+    .meta-label { font-weight:600; display:block; margin-bottom:0.2rem; color:#555; }
+    .description, .recipe-section { margin-bottom:2rem; }
+    .recipe-section { background:#fff3e0; padding:1rem 1.5rem; border-radius:10px; }
+    .class-grid, .merch-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; }
+    .class-card, .merch-item { background:#fff; padding:1rem; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.05); transition:0.2s; }
+    .class-card:hover, .merch-item:hover { transform:translateY(-3px); box-shadow:0 8px 20px rgba(0,0,0,0.1); }
+    .class-card h3, .merch-item p { margin:0.5rem 0; }
+    footer { text-align:center; padding:1.5rem 0; background:#333; color:#fff; margin-top:2rem; }
+  </style>
 </head>
 <body>
-  <!-- HEADER -->
+
+  <!-- NAV BAR -->
   <header class="sticky-header">
     <nav class="nav-container">
       <a href="/index.html" class="logo">Stir N' Sip</a>
+      <a href="/classes.html" class="cta-btn secondary-btn">All Classes</a>
+      <a href="/merch.html" class="cta-btn secondary-btn">Merch</a>
     </nav>
   </header>
 
-<!-- CLASS DETAILS -->
-<section id="class-detail" class="class-detail">
-  <h1 id="className" class="class-title">Loading...</h1>
+  <!-- CLASS DETAIL -->
+  <section id="class-detail" class="class-detail">
+    <h1 id="className" class="class-title">Loading...</h1>
+    <img id="coverImage" class="cover-image" src="" alt="Class cover image">
 
-  <div class="class-meta">
-    <div class="meta-item">
-      <span class="meta-label">Dates:</span>
-      <span id="classDate" class="meta-value"></span>
+    <div class="class-meta">
+      <div class="meta-item"><span class="meta-label">Dates:</span><span id="classDate" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">Times:</span><span id="classTime" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">Vibe:</span><span id="classVibe" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">Class Size:</span><span id="classSize" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">Spots Available:</span><span id="spotsAvailable" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">Singles Cost:</span><span id="singlesCost" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">Couples Cost:</span><span id="couplesCost" class="meta-value"></span></div>
+      <div class="meta-item"><span class="meta-label">What We’re Cooking:</span><span id="whatCooking" class="meta-value"></span></div>
     </div>
-    <div class="meta-item">
-      <span class="meta-label">Times:</span>
-      <span id="classTime" class="meta-value"></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Vibe:</span>
-      <span id="classVibe" class="meta-value"></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Size:</span>
-      <span id="classSize" class="meta-value"></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Spots Available:</span>
-      <span id="spotsAvailable" class="meta-value"></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Singles Cost:</span>
-      <span id="singlesCost" class="meta-value"></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">Couples Cost:</span>
-      <span id="couplesCost" class="meta-value"></span>
-    </div>
-    <div class="meta-item">
-      <span class="meta-label">What We Cooking:</span>
-      <span id="whatCooking" class="meta-value"></span>
-    </div>
-  </div>
 
-  <div class="buy-buttons">
-    <a id="eventbriteBtn" href="#" target="_blank" class="cta-btn">Buy on Eventbrite</a>
-    <a id="otherBuyBtn" href="#" target="_blank" class="cta-btn secondary-btn">Buy Now</a>
-  </div>
-
-  <div class="description">
-    <h2>Description</h2>
-    <p id="classDescription"></p>
-  </div>
-
-  <!-- Recipe Section -->
-  <div id="recipe-section" class="recipe-section">
-    <h2>Recipe & Extras</h2>
-    <div id="recipeContent">
-      <p>Recipes and extras will appear here for this class.</p>
+    <div class="buy-buttons">
+      <a id="eventbriteBtn" href="#" target="_blank" class="cta-btn">Buy on Eventbrite</a>
+      <a id="otherBuyBtn" href="#" target="_blank" class="cta-btn secondary-btn">Buy Now</a>
     </div>
-  </div>
-</section>
 
+    <div class="description">
+      <h2>Description</h2>
+      <p id="classDescription"></p>
+    </div>
 
-<!-- UPCOMING CLASSES -->
-<section id="upcomingClasses" class="classes">
-  <h2>Upcoming Classes</h2>
-  <div id="classesList" class="class-grid"></div>
-</section>
+    <div id="recipe-section" class="recipe-section">
+      <h2>Recipe & Extras</h2>
+      <div id="recipeContent">
+        <p>Recipes and extras will appear here for this class.</p>
+      </div>
+    </div>
+  </section>
 
-<!-- MERCH SECTION -->
-<section id="merchSection" class="merch">
-  <h2>Merch</h2>
-  <div id="merchList" class="merch-grid">
-    <!-- Merch items loaded dynamically -->
-  </div>
-</section>
+  <!-- UPCOMING CLASSES -->
+  <section id="upcomingClasses" class="classes">
+    <h2>Upcoming Classes</h2>
+    <div id="classesList" class="class-grid"></div>
+  </section>
 
+  <!-- MERCH SECTION -->
+  <section id="merchSection" class="merch">
+    <h2>Merch</h2>
+    <div id="merchList" class="merch-grid"></div>
+  </section>
 
   <!-- FOOTER -->
   <footer>
     <p>&copy; 2025 Stir & Sip</p>
   </footer>
 
-  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+    import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
-  <script src="https://rw-501.github.io/StirNSip/class/class.js" type="module"></script>
+    const firebaseConfig = { /* your config */ };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const classId = new URLSearchParams(window.location.search).get("id");
+
+    const elements = {
+      classNameEl: document.getElementById("className"),
+      coverImageEl: document.getElementById("coverImage"),
+      classDateEl: document.getElementById("classDate"),
+      classTimeEl: document.getElementById("classTime"),
+      classDescriptionEl: document.getElementById("classDescription"),
+      classVibeEl: document.getElementById("classVibe"),
+      classSizeEl: document.getElementById("classSize"),
+      spotsAvailableEl: document.getElementById("spotsAvailable"),
+      singlesCostEl: document.getElementById("singlesCost"),
+      couplesCostEl: document.getElementById("couplesCost"),
+      whatCookingEl: document.getElementById("whatCooking"),
+      recipeContentEl: document.getElementById("recipeContent"),
+      eventbriteBtn: document.getElementById("eventbriteBtn"),
+      otherBuyBtn: document.getElementById("otherBuyBtn"),
+    };
+
+    function formatDate(dateStr) {
+      const options = { weekday:"short", month:"short", day:"numeric", year:"numeric" };
+      return new Date(dateStr).toLocaleDateString("en-US", options);
+    }
+    function formatTime(timeStr) {
+      // optional: format "14:00" to "2:00 PM"
+      const [h,m] = timeStr.split(":").map(Number);
+      const date = new Date();
+      date.setHours(h, m);
+      return date.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"});
+    }
+
+    async function loadClassDetails() {
+      if (!classId) { elements.classNameEl.textContent="Class not found"; return; }
+      try {
+        const docSnap = await getDoc(doc(db,"classes",classId));
+        if (!docSnap.exists()) { elements.classNameEl.textContent="Class not found"; return; }
+        const data = docSnap.data();
+
+        elements.classNameEl.textContent = data.name;
+        elements.coverImageEl.src = data.coverImage || "";
+        elements.coverImageEl.alt = data.name;
+
+        if (data.dateTimes && data.dateTimes.length) {
+          elements.classDateEl.textContent = data.dateTimes.map(dt=>formatDate(dt.date)).join(", ");
+          elements.classTimeEl.textContent = data.dateTimes.map(dt=>formatTime(dt.time)).join(", ");
+        } else {
+          elements.classDateEl.textContent = formatDate(data.firstDate);
+          elements.classTimeEl.textContent = "TBD";
+        }
+
+        elements.classDescriptionEl.textContent = data.description;
+        elements.classVibeEl.textContent = `Vibe: ${data.vibe || "N/A"}`;
+        elements.classSizeEl.textContent = `Size: ${data.classSize || 0}`;
+        elements.spotsAvailableEl.textContent = `Spots Available: ${data.spotsAvailable || 0}`;
+        elements.singlesCostEl.textContent = `Singles: $${data.singlesCost?.toFixed(2) || 0}`;
+        elements.couplesCostEl.textContent = `Couples: $${data.couplesCost?.toFixed(2) || 0}`;
+        elements.whatCookingEl.textContent = `What We’re Cooking: ${data.whatCooking || "TBD"}`;
+        elements.recipeContentEl.innerHTML = data.recipe || "<p>Recipe coming soon!</p>";
+
+        elements.eventbriteBtn.href = data.eventbriteLink || "#";
+        elements.otherBuyBtn.href = data.otherBuyLink || "#";
+
+      } catch(err){ console.error(err); elements.classNameEl.textContent="Error loading class"; }
+    }
+
+    loadClassDetails();
+  </script>
 </body>
 </html>
