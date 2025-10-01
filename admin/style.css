@@ -473,12 +473,6 @@ form button:hover {
   font-weight: bold;
 }
 
-/* MAIN */
-main {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
 
 /* FOOTER */
 .footer {
