@@ -478,6 +478,11 @@ onSnapshot(collection(db, "gallery"), snapshot => {
       merchCoverPreview.src = data.url;
     });
     merchCoverOptions.appendChild(merchImg);
+
+    
+    // Initialize popup for all gallery images
+  initImagePopup('img');
+  
   });
 
   // --- Event Listeners ---
@@ -1121,8 +1126,6 @@ function setupAdminNav() {
 document.addEventListener("DOMContentLoaded", () => {
   setupAdminNav();
 
-    // Initialize popup for all gallery images
-  initImagePopup('img');
 
 });
 

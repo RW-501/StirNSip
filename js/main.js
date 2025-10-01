@@ -4,6 +4,8 @@
 import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
 
+    import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
+
     const firebaseConfig = { 
       apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
       authDomain: "stirnsip-978dc.firebaseapp.com",
@@ -71,6 +73,10 @@ onSnapshot(collection(db, "gallery"), snapshot => {
 
     galleryList.appendChild(div);
   });
+
+  
+  // Initialize popup for all gallery images
+  initImagePopup('img');
 });
 
 
@@ -208,10 +214,6 @@ onSnapshot(query(collection(db, "merch"), where("visible", "==", true)), snapsho
     document.getElementById("year").textContent = new Date().getFullYear();
  
 
-    import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
-
-  // Initialize popup for all gallery images
-  initImagePopup('img');
 
 
 
