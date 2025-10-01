@@ -299,8 +299,9 @@ async function loadUpcomingClasses() {
     // Firestore requires 'where' before 'orderBy'
     const q = query(
       collection(db, "classes"),
-      where("active", "==", true)
-    );
+  where("visible", "==", true),
+  orderBy("firstDate", "asc")
+);
 
     const snapshot = await getDocs(q);
     console.log("loadUpcomingClasses snapshot: ", snapshot);
