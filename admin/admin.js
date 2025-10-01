@@ -1116,7 +1116,7 @@ function setupAdminNav() {
 
   // Optional: hide all sections on page load except first
   document.querySelectorAll("section, form#class-form").forEach((sec, i) => {
-   // sec.style.display = i === 0 ? "block" : "none";
+    sec.style.display = i === 0 ? "block" : "none";
   });
 }
 
