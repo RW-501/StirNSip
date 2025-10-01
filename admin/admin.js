@@ -265,7 +265,7 @@ document.querySelectorAll(".date-time-group").forEach(group => {
 });
 
 // Convert to array of objects if you prefer
-const result = Object.entries(dateTimes).map(([date, times]) => ({ date, times }));
+//const result = Object.entries(dateTimes).map(([date, times]) => ({ date, times }));
 
 
   const classData = {
@@ -282,7 +282,7 @@ const result = Object.entries(dateTimes).map(([date, times]) => ({ date, times }
     coverImage,
     secondLink,
     eventbriteLink,
-    dateTimes: result
+    dateTimes: dateTimes
   };
 
   try {
