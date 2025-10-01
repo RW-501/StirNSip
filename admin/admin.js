@@ -297,6 +297,9 @@ const result = Object.entries(dateTimes).map(([date, times]) => ({ date, times }
       <input type="time" class="classTime" required />
     </div>`; // reset with one date/time
     loadClasses();
+        
+    showToast("Class Saved!");
+
   } catch (err) {
     console.error("Error saving class:", err);
   }
