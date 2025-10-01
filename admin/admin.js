@@ -1122,3 +1122,80 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initialize popup for all gallery images
   initImagePopup('img');
+
+
+
+
+  
+// HTML container where admin table will be rendered
+const adminContainer = document.getElementById("contactAdminSection");
+
+if (!adminContainer) {
+  console.warn("No admin container found. Add a div with id='contactAdminSection'");
+}
+
+// Function to render table
+export function initContactAdmin() {
+  // Create table
+  const table = document.createElement("table");
+  table.id = "contactAdminTable";
+  table.style.width = "100%";
+  table.style.borderCollapse = "collapse";
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Subject</th>
+        <th>Message</th>
+        <th>Guests</th>
+        <th>Food Type</th>
+        <th>Event Date</th>
+        <th>Event Time</th>
+        <th>Location</th>
+        <th>Contact Method</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
+
+  adminContainer.appendChild(table);
+
+  const tbody = table.querySelector("tbody");
+
+  // Real-time listener for submissions
+  onSnapshot(collection(db, "contactSubmissions"), snapshot => {
+    tbody.innerHTML = ""; // clear table
+
+    if (snapshot.empty) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="10" style="text-align:center">No submissions yet</td>`;
+      tbody.appendChild(tr);
+      return;
+    }
+
+    snapshot.docs.forEach(docSnap => {
+      const data = docSnap.data();
+      const tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid #ccc";
+
+      tr.innerHTML = `
+        <td>${data.name || ""}</td>
+        <td>${data.email || ""}</td>
+        <td>${data.subject || ""}</td>
+        <td>${data.message || ""}</td>
+        <td>${data.guests || ""}</td>
+        <td>${data.foodType || ""}</td>
+        <td>${data.eventDate || ""}</td>
+        <td>${data.eventTime || ""}</td>
+        <td>${data.location || ""}</td>
+        <td>${data.contactMethod || ""}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  }, err => {
+    console.error("Error loading submissions:", err);
+    showToast("Error loading submissions");
+  });
+}
