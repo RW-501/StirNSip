@@ -590,10 +590,7 @@ footer {
 @media (max-width: 600px) {
   #heroSection {
 
-  section {
-    padding: .5rem;
-    min-height: 40vh !important;
-}
+
 .hero-content {
     position: relative;
     z-index: 2;
@@ -606,7 +603,10 @@ footer {
 
 
   }
-
+  section {
+    padding: .5rem;
+    min-height: 40vh !important;
+}
 }
 
 
