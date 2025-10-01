@@ -344,3 +344,17 @@ footer {
         border-top: 1px solid rgba(255, 255, 255, 0.1);
     }
 }
+
+
+
+
+#mainMerchImage {
+    width: 100%;
+    border: 2px solid rgb(51, 51, 51);
+    margin-bottom: 10px;
+    cursor: zoom-in;
+    height: 15rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+}
