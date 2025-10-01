@@ -16,11 +16,13 @@ body {
 }
 /* ====== Main Content ====== */
 main {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: justify;
+    width: min-content;
+    place-self: center;
 }
-
 
 h1, h2, h3, h4 {
   color: #222;
