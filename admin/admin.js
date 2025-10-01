@@ -499,3 +499,147 @@ onSnapshot(collection(db, "gallery"), snapshot => {
 });
 
 
+
+
+const saveTemplateBtn = document.getElementById("saveTemplate");
+const templateSelect = document.getElementById("templateSelect");
+const loadTemplateBtn = document.getElementById("loadTemplate");
+
+// Save current form as template
+saveTemplateBtn.addEventListener("click", async () => {
+  const name = document.getElementById("className").value;
+  if (!name) {
+    alert("Please enter a class name before saving as template.");
+    return;
+  }
+
+  // Gather class data like you do for saving
+  const dateTimes = [];
+  document.querySelectorAll(".date-time-group").forEach(group => {
+    const date = group.querySelector(".classDate")?.value || "";
+    const time = group.querySelector(".classTime")?.value || "";
+    if (date || time) dateTimes.push({ date, time });
+  });
+
+  const templateData = {
+    name,
+    description: document.getElementById("classDescription").value,
+    recipe: document.getElementById("classRecipe").value,
+    whatCooking: document.getElementById("whatCooking").value,
+    singlesCost: parseFloat(document.getElementById("singlesCost").value) || 0,
+    couplesCost: parseFloat(document.getElementById("couplesCost").value) || 0,
+    classSize: parseInt(classSize.value) || 0,
+    spotsAvailable: parseInt(spotsAvailable.value) || 0,
+    vibe: classVibe.value,
+    coverImage: classCoverSelect.value,
+    eventbriteLink: document.getElementById("eventbriteLink").value,
+    secondLink: document.getElementById("secondLink").value,
+    dateTimes
+  };
+
+  try {
+    await addDoc(collection(db, "classTemplates"), templateData);
+    alert("Template saved!");
+    loadTemplates();
+  } catch (err) {
+    console.error("Error saving template:", err);
+  }
+});
+
+async function loadTemplates() {
+  templateSelect.innerHTML = `<option value="">-- Load Template --</option>`;
+  const snapshot = await getDocs(collection(db, "classTemplates"));
+  snapshot.forEach(docSnap => {
+    const option = document.createElement("option");
+    option.value = docSnap.id;
+    option.textContent = docSnap.data().name;
+    templateSelect.appendChild(option);
+  });
+}
+
+// Call on page load
+loadTemplates();
+
+
+loadTemplateBtn.addEventListener("click", async () => {
+  const id = templateSelect.value;
+  if (!id) return;
+
+  const docSnap = await getDoc(doc(db, "classTemplates", id));
+  if (!docSnap.exists()) return;
+
+  const tpl = docSnap.data();
+
+  document.getElementById("className").value = tpl.name || "";
+  document.getElementById("classDescription").value = tpl.description || "";
+  document.getElementById("classRecipe").value = tpl.recipe || "";
+  document.getElementById("whatCooking").value = tpl.whatCooking || "";
+  document.getElementById("singlesCost").value = tpl.singlesCost || 0;
+  document.getElementById("couplesCost").value = tpl.couplesCost || 0;
+  classSize.value = tpl.classSize || 0;
+  spotsAvailable.value = tpl.spotsAvailable || 0;
+  classVibe.value = tpl.vibe || "";
+  classCoverSelect.value = tpl.coverImage || "";
+  coverPreview.src = tpl.coverImage || "";
+  document.getElementById("eventbriteLink").value = tpl.eventbriteLink || "";
+  document.getElementById("secondLink").value = tpl.secondLink || "";
+
+  // Date/times
+  dateTimeContainer.innerHTML = "";
+  if (Array.isArray(tpl.dateTimes)) {
+    tpl.dateTimes.forEach(dt => {
+      const div = document.createElement("div");
+      div.className = "date-time-group";
+      div.innerHTML = `
+        <input type="date" class="classDate" value="${dt.date || ""}" />
+        <input type="time" class="classTime" value="${dt.time || ""}" />
+        <button type="button" class="removeDateTime">Remove</button>
+      `;
+      dateTimeContainer.appendChild(div);
+      div.querySelector(".removeDateTime").addEventListener("click", () => div.remove());
+    });
+  }
+});
+
+const updateTemplateBtn = document.getElementById("updateTemplate");
+
+// Update existing template
+updateTemplateBtn.addEventListener("click", async () => {
+  const id = templateSelect.value;
+  if (!id) {
+    alert("Please select a template to update.");
+    return;
+  }
+
+  // Gather current form values
+  const dateTimes = [];
+  document.querySelectorAll(".date-time-group").forEach(group => {
+    const date = group.querySelector(".classDate")?.value || "";
+    const time = group.querySelector(".classTime")?.value || "";
+    if (date || time) dateTimes.push({ date, time });
+  });
+
+  const templateData = {
+    name: document.getElementById("className").value,
+    description: document.getElementById("classDescription").value,
+    recipe: document.getElementById("classRecipe").value,
+    whatCooking: document.getElementById("whatCooking").value,
+    singlesCost: parseFloat(document.getElementById("singlesCost").value) || 0,
+    couplesCost: parseFloat(document.getElementById("couplesCost").value) || 0,
+    classSize: parseInt(classSize.value) || 0,
+    spotsAvailable: parseInt(spotsAvailable.value) || 0,
+    vibe: classVibe.value,
+    coverImage: classCoverSelect.value,
+    eventbriteLink: document.getElementById("eventbriteLink").value,
+    secondLink: document.getElementById("secondLink").value,
+    dateTimes
+  };
+
+  try {
+    await setDoc(doc(db, "classTemplates", id), templateData, { merge: true });
+    alert("Template updated!");
+    loadTemplates();
+  } catch (err) {
+    console.error("Error updating template:", err);
+  }
+});
