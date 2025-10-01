@@ -9,6 +9,7 @@ import {
   updateDoc,
   query, 
   orderBy, 
+  getDoc, 
   doc,
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
