@@ -164,7 +164,16 @@
     import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
     import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
-    const firebaseConfig = { /* your config */ };
+    // Firebase config
+const firebaseConfig = { 
+  apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
+  authDomain: "stirnsip-978dc.firebaseapp.com",
+  projectId: "stirnsip-978dc",
+  storageBucket: "stirnsip-978dc.firebasestorage.app",
+  messagingSenderId: "727033774529",
+  appId: "1:727033774529:web:b2d103f6231bec75916f40",
+  measurementId: "G-E72374YTPE"
+};
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
