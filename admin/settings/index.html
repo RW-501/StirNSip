@@ -286,6 +286,9 @@ async function uploadHeroImage(file) {
 
 // Save settings
 saveSettingsBtn.addEventListener("click", async () => {
+  // Example: your save button
+autoProcessingButton(saveSettingsBtn, "Saving...");
+
   try {
     let heroUrl = heroPreview.src;
     if (heroImageInput.files[0]) {
@@ -352,6 +355,32 @@ async function uploadMainMerchImage(file) {
   return await getDownloadURL(storageRef);
 }
 
+
+/**
+ * Automatically handles button state (disabled + text) for any async click handler
+ * @param {HTMLButtonElement} button 
+ * @param {string} processingText - Text to show while processing
+ */
+function autoProcessingButton(button, processingText = "Processing...") {
+  const originalClick = button.onclick; // Save existing handler
+  const originalText = button.textContent;
+
+  button.onclick = async (e) => {
+    if (!originalClick) return;
+    
+    button.disabled = true;
+    button.textContent = processingText;
+
+    try {
+      await originalClick.call(button, e); // call original click handler
+    } catch (err) {
+      console.error(err);
+    } finally {
+      button.disabled = false;
+      button.textContent = originalText;
+    }
+  };
+}
 
 // Initial load
 loadSettings();

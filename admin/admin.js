@@ -227,6 +227,8 @@ addDateTimeBtn.addEventListener("click", () => {
 // When saving form → gather all dates/times into an array
 classForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+// Example: your save button
+autoProcessing(classForm, "Saving...");
 
   const id = document.getElementById("classId").value;
   const name = document.getElementById("className").value;
@@ -383,6 +385,8 @@ dropZone.addEventListener("drop", (e) => {
 // -------------------- Gallery Upload --------------------
 galleryForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+// Example: your save button
+autoProcessing(galleryForm, "Saving...");
 
   const files = galleryInput.files;
   if (!files.length) return alert("Please select at least one image");
@@ -533,6 +537,9 @@ const loadTemplateBtn = document.getElementById("loadTemplate");
 
 // Save current form as template
 saveTemplateBtn.addEventListener("click", async () => {
+    // Example: your save button
+autoProcessing(saveTemplateBtn, "Saving...");
+
   const name = document.getElementById("className").value;
   if (!name) {
     showToast("Please enter a class name before saving as template.");
@@ -631,6 +638,9 @@ const updateTemplateBtn = document.getElementById("updateTemplate");
 
 // Update existing template
 updateTemplateBtn.addEventListener("click", async () => {
+          // Example: your save button
+autoProcessing(updateTemplateBtn, "Updating...");
+
   const id = templateSelect.value;
   if (!id) {
     showToast("Please select a template to update.");
@@ -766,6 +776,9 @@ async function loadMerch() {
 // Save merch
 merchForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+      // Example: your save button
+autoProcessing(merchForm, "Saving...");
+
   const id = document.getElementById("merchId").value;
   const name = document.getElementById("merchName").value;
   const description = document.getElementById("merchDescription").value;
@@ -941,6 +954,9 @@ tr.querySelector(".editPics")?.addEventListener("click", () => openGalleryPicker
 
   // Notes popup
   saveBudgetNotesBtn.addEventListener("click", async () => {
+    // Example: your save button
+autoProcessing(saveBudgetNotesBtn, "Saving...");
+
     if (!currentNotesId) return;
     await updateDoc(doc(db, "budgets", currentNotesId), { notes: budgetNotesText.value });
     showToast("Notes saved");
@@ -1210,3 +1226,59 @@ export function initContactAdmin() {
 
 
 initContactAdmin();
+
+
+
+/**
+ * Auto handles button or form state (disabled + text) during async processing
+ * @param {HTMLButtonElement|HTMLFormElement} el - Button OR Form
+ * @param {string} processingText - Text to show while processing
+ */
+function autoProcessing(el, processingText = "Processing...") {
+  if (el.tagName === "BUTTON") {
+    // --- Handle BUTTON case ---
+    const originalClick = el.onclick;
+    const originalText = el.textContent;
+
+    el.onclick = async (e) => {
+      if (!originalClick) return;
+
+      el.disabled = true;
+      el.textContent = processingText;
+
+      try {
+        await originalClick.call(el, e);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        el.disabled = false;
+        el.textContent = originalText;
+      }
+    };
+
+  } else if (el.tagName === "FORM") {
+    // --- Handle FORM case ---
+    const btn = el.querySelector("button[type='submit']") || el.querySelector("button");
+    if (!btn) return; // no button found
+
+    const originalText = btn.textContent;
+    el.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = processingText;
+
+      try {
+        // run whatever handler is already attached
+        // but don’t lose it → dispatch a custom event
+        const event = new CustomEvent("form:process", { detail: e, cancelable: true });
+        el.dispatchEvent(event);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
+      }
+    }, { once: true });
+  }
+}
+
