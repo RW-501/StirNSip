@@ -55,6 +55,15 @@
 <label for="aboutEditor">About Section:</label>
 <div id="aboutEditor" style="height: 200px;"></div>
 
+<!-- Main Merch Image -->
+<label for="mainMerchImage">Main Merch Image:</label>
+<input type="file" id="mainMerchImage" accept="image/*" />
+<img id="mainMerchPreview" src="" alt="Main Merch Preview" style="max-width:300px; display:block; margin:0.5rem 0;" />
+<label>
+  <input type="checkbox" id="showMerchOnHome" />
+  Show on Home
+</label>
+
 
 <!-- FAQ -->
 <label>FAQs:</label>
@@ -253,6 +262,9 @@ async function loadSettings() {
       aboutEditor.root.innerHTML = data.about || "";
 
       contactInfo.value = data.contact || "";
+      
+mainMerchPreview.src = data.mainMerchImage || "";
+showMerchOnHome.checked = data.showMerchOnHome || false;
 
       // Load FAQs dynamically
       faqContainer.innerHTML = "";
@@ -289,16 +301,24 @@ saveSettingsBtn.addEventListener("click", async () => {
 
     const aboutHtml = aboutEditor.root.innerHTML; // Quill stores rich text as HTML
 
+// Inside saveSettingsBtn click listener
+let mainMerchUrl = mainMerchPreview.src;
+if (mainMerchImageInput.files[0]) {
+  mainMerchUrl = await uploadMainMerchImage(mainMerchImageInput.files[0]);
+  mainMerchPreview.src = mainMerchUrl;
+}
 
-    const settingsData = {
-      heroImage: heroUrl,
-       about: aboutHtml,
+// Add to settingsData
+const settingsData = {
+  heroImage: heroUrl,
+  mainMerchImage: mainMerchUrl,
+  showMerchOnHome: showMerchOnHome.checked,
+  about: aboutHtml,
+  faq: faqs,
+  contact: contactInfo.value,
+  updatedAt: Timestamp.fromDate(new Date())
+};
 
-
-      faq: faqs,
-      contact: contactInfo.value,
-      updatedAt: Timestamp.fromDate(new Date())
-    };
 
     const settingsDoc = doc(db, "siteSettings", "main");
     await updateDoc(settingsDoc, settingsData).catch(async () => {
@@ -309,6 +329,29 @@ saveSettingsBtn.addEventListener("click", async () => {
     console.error("Error saving settings:", err);
   }
 });
+
+const mainMerchImageInput = document.getElementById("mainMerchImage");
+const mainMerchPreview = document.getElementById("mainMerchPreview");
+const showMerchOnHome = document.getElementById("showMerchOnHome");
+
+// Preview selected merch image
+mainMerchImageInput.addEventListener("change", () => {
+  const file = mainMerchImageInput.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = e => mainMerchPreview.src = e.target.result;
+    reader.readAsDataURL(file);
+  }
+});
+
+// Upload function (like hero image)
+async function uploadMainMerchImage(file) {
+  const fileName = `merch_main_${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, `settings/${fileName}`);
+  await uploadBytes(storageRef, file);
+  return await getDownloadURL(storageRef);
+}
+
 
 // Initial load
 loadSettings();

@@ -30,7 +30,6 @@ const galleryList = document.getElementById("galleryList");
 const faqListEl = document.getElementById("faqList");
 const faqSearch = document.getElementById("faqSearch");
 
-// Load site-wide settings
 async function loadSiteSettings() {
   try {
     const settingsDoc = doc(db, "siteSettings", "main");
@@ -43,6 +42,17 @@ async function loadSiteSettings() {
       heroImage.src = data.heroImage || "";
       aboutText.innerHTML  = data.about || "";
 
+      // Main merch image
+      const mainMerchContainer = document.getElementById("mainMerchContainer");
+      const mainMerchImage = document.getElementById("mainMerchImage");
+
+      if (data.mainMerchImage && data.showMerchOnHome) {
+        mainMerchImage.src = data.mainMerchImage;
+        mainMerchContainer.style.display = "block";
+      } else {
+        mainMerchContainer.style.display = "none";
+      }
+
       // Load FAQ
       renderFAQ(data.faq || []);
     }
@@ -50,6 +60,7 @@ async function loadSiteSettings() {
     console.error("Error loading site settings:", err);
   }
 }
+
 
 
 // -------------------- Gallery Live Render --------------------
