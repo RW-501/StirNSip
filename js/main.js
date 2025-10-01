@@ -182,6 +182,8 @@ onSnapshot(query(collection(db, "merch"), where("visible", "==", true)), snapsho
   merchListHome.innerHTML = "";
   snapshot.docs.forEach(docSnap => {
     const m = docSnap.data();
+    const isAvailable = m.available > 0 && m.link;
+    
     const div = document.createElement("div");
     div.className = "merch-card";
     div.innerHTML = `
@@ -189,14 +191,15 @@ onSnapshot(query(collection(db, "merch"), where("visible", "==", true)), snapsho
       <h4>${m.name}</h4>
       <p>${m.description}</p>
       <p><strong>Cost:</strong> $${m.cost?.toFixed(2) || 0}</p>
-      <p>${m.available} in stock</p>
-      <a href="${m.link || '#'}" target="_blank" class="cta-btn">
-        ${m.link ? "Buy Now" : "Coming Soon"}
+      <p><strong>Stock:</strong> ${m.available || 0}</p>
+      <a href="${isAvailable ? m.link : '#'}" target="_blank" class="cta-btn" style="pointer-events:${isAvailable ? "auto" : "none"}; opacity:${isAvailable ? 1 : 0.5}">
+        ${isAvailable ? "Buy Now" : "Coming Soon"}
       </a>
     `;
     merchListHome.appendChild(div);
   });
 });
+
 
     // Initial site settings load
     loadSiteSettings();
