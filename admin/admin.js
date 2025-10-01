@@ -874,23 +874,64 @@ export async function initBudgetPlanner(options = {}) {
   }
 
   // Render table
-  function renderTable() {
-    const searchText = budgetSearch.value.toLowerCase();
-    const filterClass = budgetFilterClass.value;
-    budgetTableBody.innerHTML = "";
+function renderTable() {
+  const searchText = budgetSearch.value.toLowerCase();
+  const filterClass = budgetFilterClass.value;
+  budgetTableBody.innerHTML = "";
 
-    let totalEst = 0, totalActual = 0, totalTicket = 0, totalVenue = 0, totalProfit = 0;
+  let globalTotals = {
+    est: 0,
+    actual: 0,
+    ticket: 0,
+    venue: 0,
+    profit: 0
+  };
 
-    budgetData.forEach(item => {
-      if (searchText && !item.item.toLowerCase().includes(searchText)) return;
-      if (filterClass && item.classId !== filterClass) return;
+  // group by className
+  const grouped = {};
+  budgetData.forEach(item => {
+    if (searchText && !item.item.toLowerCase().includes(searchText)) return;
+    if (filterClass && item.classId !== filterClass) return;
 
+    if (!grouped[item.className]) grouped[item.className] = [];
+    grouped[item.className].push(item);
+  });
+
+  Object.entries(grouped).forEach(([className, items]) => {
+    // insert header row for class
+    const headerRow = document.createElement("tr");
+    headerRow.classList.add("classHeader");
+    headerRow.innerHTML = `
+      <td colspan="13" style="background:#f4f4f4;font-weight:bold;cursor:pointer;">
+        ${className || "Unassigned"} (Click to collapse/expand)
+      </td>`;
+    headerRow.addEventListener("click", () => {
+      const next = headerRow.nextSibling;
+      while (next && !next.classList.contains("classHeader")) {
+        next.classList.toggle("hiddenRow");
+        next = next.nextSibling;
+      }
+    });
+    budgetTableBody.appendChild(headerRow);
+
+    // per-class totals
+    let classTotals = { est: 0, actual: 0, ticket: 0, venue: 0, profit: 0 };
+
+    items.forEach(item => {
       const profit = (item.ticketCost || 0) - ((item.actualCost || 0) + (item.venueCost || 0));
-      totalEst += item.estimatedCost || 0;
-      totalActual += item.actualCost || 0;
-      totalTicket += item.ticketCost || 0;
-      totalVenue += item.venueCost || 0;
-      totalProfit += profit;
+      const margin = item.ticketCost ? ((profit / item.ticketCost) * 100).toFixed(1) + "%" : "—";
+
+      classTotals.est += item.estimatedCost || 0;
+      classTotals.actual += item.actualCost || 0;
+      classTotals.ticket += item.ticketCost || 0;
+      classTotals.venue += item.venueCost || 0;
+      classTotals.profit += profit;
+
+      globalTotals.est += item.estimatedCost || 0;
+      globalTotals.actual += item.actualCost || 0;
+      globalTotals.ticket += item.ticketCost || 0;
+      globalTotals.venue += item.venueCost || 0;
+      globalTotals.profit += profit;
 
       const tr = document.createElement("tr");
       tr.dataset.id = item.id;
@@ -904,6 +945,7 @@ export async function initBudgetPlanner(options = {}) {
         <td contenteditable class="ticketCost">${item.ticketCost || 0}</td>
         <td contenteditable class="venueCost">${item.venueCost || 0}</td>
         <td>${profit.toFixed(2)}</td>
+        <td>${margin}</td>
         <td class="linksCell">${(item.links || []).map(l=>`<a href="${l}" target="_blank">Link</a>`).join("<br>")} <button class="editLinks">Edit</button></td>
         <td class="picsCell">${(item.pictures || []).map(img=>`<img src="${img}" width="50"/>`).join("")} <button class="editPics">Add</button></td>
         <td>
@@ -963,13 +1005,29 @@ tr.querySelector(".editPics")?.addEventListener("click", () => openGalleryPicker
       budgetTableBody.appendChild(tr);
     });
 
-    // Update totals
-    document.getElementById("totalEstCost").textContent = totalEst.toFixed(2);
-    document.getElementById("totalActualCost").textContent = totalActual.toFixed(2);
-    document.getElementById("totalTicketCost").textContent = totalTicket.toFixed(2);
-    document.getElementById("totalVenueCost").textContent = totalVenue.toFixed(2);
-    document.getElementById("totalProfit").textContent = totalProfit.toFixed(2);
-  }
+    // add subtotal row for class
+    const subtotalRow = document.createElement("tr");
+    subtotalRow.classList.add("classSubtotal");
+    subtotalRow.innerHTML = `
+      <td colspan="3" style="font-weight:bold;background:#fafafa;">${className} Totals</td>
+      <td>${classTotals.est.toFixed(2)}</td>
+      <td>${classTotals.actual.toFixed(2)}</td>
+      <td>${classTotals.ticket.toFixed(2)}</td>
+      <td>${classTotals.venue.toFixed(2)}</td>
+      <td>${classTotals.profit.toFixed(2)}</td>
+      <td>${classTotals.ticket ? ((classTotals.profit/classTotals.ticket)*100).toFixed(1)+"%" : "—"}</td>
+      <td colspan="5"></td>
+    `;
+    budgetTableBody.appendChild(subtotalRow);
+  });
+
+  // update global footer totals
+  document.getElementById("totalEstCost").textContent = globalTotals.est.toFixed(2);
+  document.getElementById("totalActualCost").textContent = globalTotals.actual.toFixed(2);
+  document.getElementById("totalTicketCost").textContent = globalTotals.ticket.toFixed(2);
+  document.getElementById("totalVenueCost").textContent = globalTotals.venue.toFixed(2);
+  document.getElementById("totalProfit").textContent = globalTotals.profit.toFixed(2);
+}
 
   // Notes popup
   saveBudgetNotesBtn.addEventListener("click", async () => {
@@ -1301,3 +1359,73 @@ function autoProcessing(el, processingText = "Processing...") {
   }
 }
 
+
+
+ let initialData = [
+    {
+      className: "Classic Comfort Night",
+      item: "Steak, Potatoes & Corn",
+      estimatedCost: 300,
+      actualCost: 0,
+      ticketCost: 1600, // 20 spots × $80 singles
+      venueCost: 500,
+      priority: "High",
+      notes: "First trial weekend Nov 8–9"
+    },
+    {
+      className: "Fiesta & Sip",
+      item: "Mexican Fajitas + Cajun Rice",
+      estimatedCost: 280,
+      ticketCost: 1600,
+      venueCost: 500,
+      priority: "Medium",
+      notes: "Nov 15–16 second trial weekend"
+    },
+    {
+      className: "Pan-Asian Edition",
+      item: "Stir Fry Rice",
+      estimatedCost: 250,
+      ticketCost: 1600,
+      venueCost: 500
+    },
+    {
+      className: "Slice, Sip & Smile",
+      item: "Pizza Night",
+      estimatedCost: 220,
+      ticketCost: 1600,
+      venueCost: 500
+    }
+  ]
+
+  preloadBudgetData(initialData);
+
+// preload starter budgets (manual inject)
+export async function preloadBudgetData(initialData = []) {
+  for (const item of initialData) {
+    // Check if it already exists (by unique name + class)
+    const q = query(
+      collection(db, "budgets"),
+      where("item", "==", item.item),
+      where("className", "==", item.className)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) {
+      // add if not exists
+      await addDoc(collection(db, "budgets"), {
+        live: item.live || false,
+        item: item.item || "",
+        className: item.className || "",
+        classId: item.classId || null,
+        estimatedCost: item.estimatedCost || 0,
+        actualCost: item.actualCost || 0,
+        ticketCost: item.ticketCost || 0,
+        venueCost: item.venueCost || 0,
+        links: item.links || [],
+        pictures: item.pictures || [],
+        priority: item.priority || "Medium",
+        notes: item.notes || ""
+      });
+    }
+  }
+  showToast("Preload complete");
+}
