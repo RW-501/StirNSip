@@ -250,16 +250,23 @@ autoProcessing(classForm, "Saving...");
 
 
 const date = document.querySelector(".classDate").value; // one date for all
+console.log("Date:", date);
 
 const times = [];
 document.querySelectorAll(".classTime").forEach(input => {
   if (input.value) {
+    console.log("Found time:", input.value);
     times.push(input.value);
+  } else {
+    console.log("Empty time input found");
   }
 });
 
+console.log("All times array:", times);
+
 // Build final structure
 const result = [{ date, times }];
+console.log("Result:", result);
 
 const classData = {
   name,
