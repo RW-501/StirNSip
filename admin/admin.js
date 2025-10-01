@@ -206,7 +206,6 @@ addDateTimeBtn.addEventListener("click", () => {
   const div = document.createElement("div");
   div.className = "date-time-group";
   div.innerHTML = `
-    <input type="date" class="classDate" required />
     <input type="time" class="classTime" required />
     <button type="button" class="removeDateTime">Remove</button>
   `;
@@ -216,6 +215,9 @@ addDateTimeBtn.addEventListener("click", () => {
     div.remove();
   });
 });
+
+//     <input type="date" class="classDate" required />
+
 
 // When saving form → gather all dates/times into an array
 classForm.addEventListener("submit", async (e) => {
@@ -409,39 +411,55 @@ galleryForm.addEventListener("submit", async (e) => {
   galleryInput.value = "";
 });
 
-// -------------------- Gallery Live Render --------------------
+// -------------------- Gallery Live Render + Cover Options --------------------
 onSnapshot(collection(db, "gallery"), snapshot => {
   galleryList.innerHTML = "";
+  
+  // Clear and reset cover select
+  classCoverSelect.innerHTML = `<option value="">-- Select Cover --</option>`;
+
   snapshot.docs.forEach(docSnap => {
     const data = docSnap.data();
     const id = docSnap.id;
 
+    // Render gallery items
     const div = document.createElement("div");
     div.classList.add("gallery-item");
     div.style.border = "1px solid #ddd";
     div.style.padding = "5px";
+    div.style.marginBottom = "10px";
 
     div.innerHTML = `
-      <img src="${data.url}" alt="${data.group}" width="150"/>
+      <img src="${data.url}" alt="${data.group || "Gallery"}" width="150"/>
       <p><strong>Group:</strong> ${data.group || "N/A"}</p>
       ${data.cover ? `<p style="color:green;"><em>Cover Image</em></p>` : ""}
       <button data-id="${id}" class="delete-gallery">Delete</button>
     `;
 
     galleryList.appendChild(div);
+
+    // Add image to cover select
+    const option = document.createElement("option");
+    option.value = data.url;
+    option.textContent = `${data.group || "Gallery"} - ${new Date(data.createdAt?.toDate?.() || Date.now()).toLocaleDateString()}`;
+    classCoverSelect.appendChild(option);
   });
 
-  // Delete handlers
+  // Delete handler
   document.querySelectorAll(".delete-gallery").forEach(btn => {
     btn.addEventListener("click", async () => {
+      const docId = btn.dataset.id;
       if (!confirm("Delete this image?")) return;
+
       try {
-        await deleteDoc(doc(db, "gallery", btn.dataset.id));
-        alert("Image deleted");
+        await deleteDoc(doc(db, "gallery", docId));
+        alert("Image deleted!");
       } catch (err) {
         console.error("Error deleting image:", err);
       }
     });
   });
 });
+
+
 
