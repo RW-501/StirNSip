@@ -1086,40 +1086,114 @@ autoProcessing(saveBudgetNotesBtn, "Saving...");
   });
 
   // Export CSV
-  function exportCSV() {
-    let csv = "Class,Live,Item,EstCost,ActualCost,Ticket,Venue,Profit,Links,Pictures,Priority,Notes\n";
-    budgetData.forEach(item => {
-      const profit = (item.ticketCost||0) - ((item.actualCost||0)+(item.venueCost||0));
-      csv += `"${item.className || ""}",${item.live}, "${item.item || ""}",${item.estimatedCost || 0},${item.actualCost || 0},${item.ticketCost || 0},${item.venueCost || 0},${profit}, "${(item.links||[]).join("|")}","${(item.pictures||[]).join("|")}", "${item.priority}", "${item.notes || ""}"\n`;
+function exportCSV() {
+  let csv = "Class,Item,EstCost,ActualCost,Ticket,Venue,Profit,Margin,Links,Pictures,Priority,Notes\n";
+  const grouped = {};
+
+  // group items by class
+  budgetData.forEach(item => {
+    if (!grouped[item.className]) grouped[item.className] = [];
+    grouped[item.className].push(item);
+  });
+
+  let grandTotals = { est:0, actual:0, ticket:0, venue:0, profit:0 };
+
+  Object.entries(grouped).forEach(([className, items]) => {
+    let classTotals = { est:0, actual:0, ticket:0, venue:0, profit:0 };
+
+    items.forEach(item => {
+      const profit = (item.ticketCost||0) - ((item.actualCost||0) + (item.venueCost||0));
+      const margin = item.ticketCost ? ((profit/item.ticketCost)*100).toFixed(1)+"%" : "—";
+
+      classTotals.est += item.estimatedCost||0;
+      classTotals.actual += item.actualCost||0;
+      classTotals.ticket += item.ticketCost||0;
+      classTotals.venue += item.venueCost||0;
+      classTotals.profit += profit;
+
+      csv += `"${className}","${item.item||""}",${item.estimatedCost||0},${item.actualCost||0},${item.ticketCost||0},${item.venueCost||0},${profit},"${margin}","${(item.links||[]).join("|")}","${(item.pictures||[]).join("|")}","${item.priority}","${item.notes||""}"\n`;
     });
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "budget.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+
+    // add class subtotal row
+    const classMargin = classTotals.ticket ? ((classTotals.profit/classTotals.ticket)*100).toFixed(1)+"%" : "—";
+    csv += `"${className} Totals","",${classTotals.est},${classTotals.actual},${classTotals.ticket},${classTotals.venue},${classTotals.profit},"${classMargin}","","","",""\n`;
+
+    // accumulate grand totals
+    Object.keys(grandTotals).forEach(k => grandTotals[k] += classTotals[k]);
+  });
+
+  // add grand total row
+  const grandMargin = grandTotals.ticket ? ((grandTotals.profit/grandTotals.ticket)*100).toFixed(1)+"%" : "—";
+  csv += `"Grand Total","",${grandTotals.est},${grandTotals.actual},${grandTotals.ticket},${grandTotals.venue},${grandTotals.profit},"${grandMargin}","","","",""\n`;
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "budget_report.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 
   // Export PDF (using jsPDF if loaded on page)
-  function exportPDF() {
-    if (typeof jsPDF === "undefined") {
-      alert("jsPDF not loaded");
-      return;
-    }
-    const doc = new jsPDF();
-    let y = 10;
-    budgetData.forEach(item => {
-      const profit = (item.ticketCost||0) - ((item.actualCost||0)+(item.venueCost||0));
-      doc.text(`Class: ${item.className || ""}`, 10, y); y+=6;
-      doc.text(`Item: ${item.item || ""}`, 10, y); y+=6;
-      doc.text(`EstCost: ${item.estimatedCost || 0} | Actual: ${item.actualCost || 0} | Ticket: ${item.ticketCost || 0} | Venue: ${item.venueCost || 0} | Profit: ${profit}`, 10, y); y+=8;
-      doc.text(`Links: ${(item.links||[]).join(", ")}`, 10, y); y+=6;
-      doc.text(`Notes: ${item.notes || ""}`, 10, y); y+=10;
-      if(y>280){doc.addPage();y=10;}
-    });
-    doc.save("budget.pdf");
+function exportPDF() {
+  if (typeof jsPDF === "undefined") {
+    alert("jsPDF not loaded");
+    return;
   }
+  const doc = new jsPDF();
+  let y = 10;
+  const grouped = {};
+
+  // group items by class
+  budgetData.forEach(item => {
+    if (!grouped[item.className]) grouped[item.className] = [];
+    grouped[item.className].push(item);
+  });
+
+  let grandTotals = { est:0, actual:0, ticket:0, venue:0, profit:0 };
+
+  Object.entries(grouped).forEach(([className, items]) => {
+    doc.setFont(undefined, "bold");
+    doc.text(`Class: ${className}`, 10, y); y += 6;
+    doc.setFont(undefined, "normal");
+
+    let classTotals = { est:0, actual:0, ticket:0, venue:0, profit:0 };
+
+    items.forEach(item => {
+      const profit = (item.ticketCost||0) - ((item.actualCost||0) + (item.venueCost||0));
+      const margin = item.ticketCost ? ((profit/item.ticketCost)*100).toFixed(1)+"%" : "—";
+
+      classTotals.est += item.estimatedCost||0;
+      classTotals.actual += item.actualCost||0;
+      classTotals.ticket += item.ticketCost||0;
+      classTotals.venue += item.venueCost||0;
+      classTotals.profit += profit;
+
+      doc.text(`Item: ${item.item || ""} | Est: ${item.estimatedCost || 0} | Actual: ${item.actualCost || 0} | Ticket: ${item.ticketCost || 0} | Venue: ${item.venueCost || 0} | Profit: ${profit} | Margin: ${margin}`, 10, y);
+      y += 6;
+      if (y > 280) { doc.addPage(); y = 10; }
+    });
+
+    // class totals row
+    const classMargin = classTotals.ticket ? ((classTotals.profit/classTotals.ticket)*100).toFixed(1)+"%" : "—";
+    doc.setFont(undefined, "bold");
+    doc.text(`Subtotal: Est ${classTotals.est} | Actual ${classTotals.actual} | Ticket ${classTotals.ticket} | Venue ${classTotals.venue} | Profit ${classTotals.profit} | Margin ${classMargin}`, 10, y); y += 10;
+    doc.setFont(undefined, "normal");
+
+    // accumulate grand totals
+    Object.keys(grandTotals).forEach(k => grandTotals[k] += classTotals[k]);
+  });
+
+  // grand totals
+  const grandMargin = grandTotals.ticket ? ((grandTotals.profit/grandTotals.ticket)*100).toFixed(1)+"%" : "—";
+  doc.setFont(undefined, "bold");
+  doc.text(`GRAND TOTAL: Est ${grandTotals.est} | Actual ${grandTotals.actual} | Ticket ${grandTotals.ticket} | Venue ${grandTotals.venue} | Profit ${grandTotals.profit} | Margin ${grandMargin}`, 10, y);
+
+  doc.save("budget_report.pdf");
+}
+
 
   // Listen for export events
   document.getElementById("exportCSVBtn")?.addEventListener("click", exportCSV);
