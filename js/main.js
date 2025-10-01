@@ -140,46 +140,72 @@ function renderClasses(docs) {
     return;
   }
 
-  // Group by class name
-  const grouped = {};
-  docs.forEach((docSnap) => {
-    const data = docSnap.data();
-    console.log("data: ",data);
-    
-    if (!grouped[data.name]) {
-      grouped[data.name] = {
-        description: data.description,
-        id: docSnap.id, // keep first ID for details page
-        times: []
-      };
-    }
-if (!grouped[data.name]) {
-  grouped[data.name] = { date: data.date, times: [] };
-}
-grouped[data.name].times.push(data.time);
+const grouped = {};
 
+// Group classes by name
+docs.forEach(docSnap => {
+  const data = docSnap.data();
+  if (!grouped[data.name]) {
+    grouped[data.name] = {
+      id: docSnap.id,
+      coverImage: data.coverImage || "",
+      whatCooking: data.whatCooking || "",
+      vibe: data.vibe || "",
+      singlesCost: data.singlesCost || 0,
+      couplesCost: data.couplesCost || 0,
+      dateTimes: [] // array of { date, time }
+    };
+  }
+
+  (data.dateTimes || []).forEach(dt => {
+    grouped[data.name].dateTimes.push(dt);
   });
+});
 
-  // Render grouped cards
-  Object.entries(grouped).forEach(([name, info]) => {
-    const div = document.createElement("div");
-    div.classList.add("class-card");
+// Render grouped class cards
+classesList.innerHTML = ""; // clear container
 
-    // Make badges for each time
-    const timesHtml = info.times
-      .map(
-        t => `<span class="time-badge">${info.date} @ ${info.time}</span>`
-      )
-      .join(" ");
+Object.entries(grouped).forEach(([name, info]) => {
+  const div = document.createElement("div");
+  div.classList.add("class-card");
+  div.style.border = "1px solid #ddd";
+  div.style.borderRadius = "12px";
+  div.style.overflow = "hidden";
+  div.style.boxShadow = "0 4px 10px rgba(0,0,0,0.1)";
+  div.style.marginBottom = "20px";
+  div.style.background = "#fff";
+  div.style.transition = "transform 0.2s";
+  div.onmouseover = () => div.style.transform = "scale(1.02)";
+  div.onmouseout = () => div.style.transform = "scale(1)";
 
-    div.innerHTML = `
-      <h3>${name}</h3>
-      <div class="time-badges">${timesHtml}</div>
-      <p>${info.description}</p>
-      <a href="class.html?id=${info.id}" class="cta-btn">View Details</a>
-    `;
-    classesList.appendChild(div);
-  });
+  // Build times grouped by date
+  const timesHtml = info.dateTimes
+    .map(dt => `<span class="time-badge">${dt.date} @ ${dt.time}</span>`)
+    .join(" ");
+
+  div.innerHTML = `
+    <div class="card-image" style="height:180px; background:url('${info.coverImage}') center/cover no-repeat;"></div>
+    <div class="card-content" style="padding:15px;">
+      <h3 style="margin:0 0 5px 0;">${name}</h3>
+      <p style="margin:0 0 5px 0; font-weight:bold;">Cooking: ${info.whatCooking}</p>
+      <p style="margin:0 0 10px 0;">Vibe: <span style="font-style:italic;">${info.vibe}</span></p>
+      <p style="margin:0 0 10px 0;">Cost: $${info.singlesCost} (single) | $${info.couplesCost} (couple)</p>
+      <div class="time-badges" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">${timesHtml}</div>
+      <a href="class.html?id=${info.id}" class="cta-btn" style="
+        display:inline-block; 
+        padding:8px 16px; 
+        background:#ff6347; 
+        color:#fff; 
+        text-decoration:none; 
+        border-radius:6px;
+        font-weight:bold;
+      ">View Details</a>
+    </div>
+  `;
+
+  classesList.appendChild(div);
+});
+
 }
 
 
