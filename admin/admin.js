@@ -14,6 +14,8 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 
+import { showToast } from './showToast.js';
+
 // Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
@@ -342,7 +344,7 @@ async function deleteClass(id) {
   if (!confirm("Are you sure you want to delete this class?")) return;
   try {
     await deleteDoc(doc(db, "classes", id));
-    alert("Class deleted!");
+    showToast("Class deleted!");
     loadClasses();
   } catch (err) {
     console.error("Error deleting class:", err);
@@ -402,11 +404,11 @@ galleryForm.addEventListener("submit", async (e) => {
       });
     } catch (err) {
       console.error("Error uploading image: ", err);
-      alert("Error uploading some files. Check console.");
+      showToast("Error uploading some files. Check console.");
     }
   }
 
-  alert(`${files.length} image(s) uploaded!`);
+  showToast(`${files.length} image(s) uploaded!`);
   galleryForm.reset();
   galleryInput.value = "";
 });
@@ -470,7 +472,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
 
       try {
         await deleteDoc(doc(db, "gallery", docId));
-        alert("Image deleted!");
+        showToast("Image deleted!");
       } catch (err) {
         console.error("Error deleting image:", err);
       }
@@ -490,7 +492,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
         const current = snap.data().showOnHome !== false; // default true
         await updateDoc(docRef, { showOnHome: !current });
 
-        alert(`Image is now ${!current ? "visible" : "hidden"} on home page.`);
+        showToast(`Image is now ${!current ? "visible" : "hidden"} on home page.`);
       } catch (err) {
         console.error("Error updating showOnHome:", err);
       }
@@ -509,7 +511,7 @@ const loadTemplateBtn = document.getElementById("loadTemplate");
 saveTemplateBtn.addEventListener("click", async () => {
   const name = document.getElementById("className").value;
   if (!name) {
-    alert("Please enter a class name before saving as template.");
+    showToast("Please enter a class name before saving as template.");
     return;
   }
 
@@ -539,7 +541,7 @@ saveTemplateBtn.addEventListener("click", async () => {
 
   try {
     await addDoc(collection(db, "classTemplates"), templateData);
-    alert("Template saved!");
+    showToast("Template saved!");
     loadTemplates();
   } catch (err) {
     console.error("Error saving template:", err);
@@ -607,7 +609,7 @@ const updateTemplateBtn = document.getElementById("updateTemplate");
 updateTemplateBtn.addEventListener("click", async () => {
   const id = templateSelect.value;
   if (!id) {
-    alert("Please select a template to update.");
+    showToast("Please select a template to update.");
     return;
   }
 
@@ -637,7 +639,7 @@ updateTemplateBtn.addEventListener("click", async () => {
 
   try {
     await setDoc(doc(db, "classTemplates", id), templateData, { merge: true });
-    alert("Template updated!");
+    showToast("Template updated!");
     loadTemplates();
   } catch (err) {
     console.error("Error updating template:", err);
@@ -651,7 +653,7 @@ const deleteTemplateBtn = document.getElementById("deleteTemplate");
 deleteTemplateBtn.addEventListener("click", async () => {
   const id = templateSelect.value;
   if (!id) {
-    alert("Please select a template to delete.");
+    showToast("Please select a template to delete.");
     return;
   }
 
@@ -659,10 +661,27 @@ deleteTemplateBtn.addEventListener("click", async () => {
 
   try {
     await deleteDoc(doc(db, "classTemplates", id));
-    alert("Template deleted!");
+    showToast("Template deleted!");
     loadTemplates(); // refresh dropdown
     templateSelect.value = "";
+
+    // 🔹 Clear the form fields after delete
+    document.getElementById("className").value = "";
+    document.getElementById("classDescription").value = "";
+    document.getElementById("classRecipe").value = "";
+    document.getElementById("whatCooking").value = "";
+    document.getElementById("singlesCost").value = "";
+    document.getElementById("couplesCost").value = "";
+    classSize.value = "";
+    spotsAvailable.value = "";
+    classVibe.value = "";
+    classCoverSelect.value = "";
+    coverPreview.src = "";
+    document.getElementById("eventbriteLink").value = "";
+    document.getElementById("secondLink").value = "";
+    dateTimeContainer.innerHTML = "";
   } catch (err) {
     console.error("Error deleting template:", err);
   }
 });
+
