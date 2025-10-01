@@ -439,11 +439,31 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     galleryList.appendChild(div);
 
     // Add image to cover select
-    const option = document.createElement("option");
-    option.value = data.url;
-    option.textContent = `${data.group || "Gallery"} - ${new Date(data.createdAt?.toDate?.() || Date.now()).toLocaleDateString()}`;
-    classCoverSelect.appendChild(option);
+  const coverOptions = document.getElementById("classCover");
+  coverOptions.innerHTML = "";
+
+  snapshot.docs.forEach(docSnap => {
+    const data = docSnap.data();
+    const img = document.createElement("img");
+    img.src = data.url;
+    img.alt = data.group || "Gallery";
+    img.style.width = "100px";
+    img.style.margin = "5px";
+    img.style.cursor = "pointer";
+    img.style.border = "2px solid transparent";
+
+    img.addEventListener("click", () => {
+      // Highlight selection
+      document.querySelectorAll("#coverOptions img").forEach(i => i.style.border = "2px solid transparent");
+      img.style.border = "2px solid blue";
+
+      coverPreview.src = data.url;
+      classCoverSelect.value = data.url; // optional if you still want the select value
+    });
+
+    coverOptions.appendChild(img);
   });
+});
   
 // Update preview when dropdown changes
 classCoverSelect.addEventListener("change", (e) => {
