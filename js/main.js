@@ -162,13 +162,24 @@ docs.forEach(docSnap => {
   });
 });
 
+// Function to map vibe to color
+function vibeColor(vibe) {
+  const map = {
+    "Hip Hop": "#FF6347", // reddish
+    "Jazz": "#6A5ACD",    // purple
+    "Classical": "#FFD700", // gold
+    "Casual": "#20B2AA", // teal
+    "Relaxed": "#FF69B4" // pink
+  };
+  return map[vibe] || "#333"; // default dark
+}
+
 // Render grouped class cards
 classesList.innerHTML = ""; // clear container
 
 Object.entries(grouped).forEach(([name, info]) => {
   const div = document.createElement("div");
   div.classList.add("class-card");
-  div.style.border = "1px solid #ddd";
   div.style.borderRadius = "12px";
   div.style.overflow = "hidden";
   div.style.boxShadow = "0 4px 10px rgba(0,0,0,0.1)";
@@ -177,34 +188,61 @@ Object.entries(grouped).forEach(([name, info]) => {
   div.style.transition = "transform 0.2s";
   div.onmouseover = () => div.style.transform = "scale(1.02)";
   div.onmouseout = () => div.style.transform = "scale(1)";
+  div.style.display = "flex";
+  div.style.flexDirection = "column";
 
   // Build times grouped by date
   const timesHtml = info.dateTimes
-    .map(dt => `<span class="time-badge">${dt.date} @ ${dt.time}</span>`)
+    .map(dt => `<span class="time-badge" style="
+      background:${vibeColor(info.vibe)}22; 
+      color:${vibeColor(info.vibe)}; 
+      padding:4px 8px; 
+      border-radius:4px; 
+      font-size:0.85em;
+      font-weight:500;
+      margin:2px;
+      display:inline-block;
+    ">${dt.date} @ ${dt.time}</span>`)
     .join(" ");
 
   div.innerHTML = `
-    <div class="card-image" style="height:180px; background:url('${info.coverImage}') center/cover no-repeat;"></div>
-    <div class="card-content" style="padding:15px;">
-      <h3 style="margin:0 0 5px 0;">${name}</h3>
-      <p style="margin:0 0 5px 0; font-weight:bold;">Cooking: ${info.whatCooking}</p>
-      <p style="margin:0 0 10px 0;">Vibe: <span style="font-style:italic;">${info.vibe}</span></p>
-      <p style="margin:0 0 10px 0;">Cost: $${info.singlesCost} (single) | $${info.couplesCost} (couple)</p>
-      <div class="time-badges" style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">${timesHtml}</div>
+    <div class="card-image" style="
+      height:180px; 
+      background:url('${info.coverImage}') center/cover no-repeat;
+      border-bottom:4px solid ${vibeColor(info.vibe)};
+    "></div>
+    <div class="card-content" style="padding:15px; flex:1; display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <h3 style="margin:0 0 5px 0;">${name}</h3>
+        <p style="margin:0 0 5px 0; font-weight:bold;">Cooking: ${info.whatCooking}</p>
+        <p style="margin:0 0 10px 0;">Vibe: <span style="font-style:italic;">${info.vibe}</span></p>
+        <p style="margin:0 0 10px 0;">Cost: $${info.singlesCost} (single) | $${info.couplesCost} (couple)</p>
+        <div class="time-badges" style="display:flex; flex-wrap:wrap;">${timesHtml}</div>
+      </div>
       <a href="class.html?id=${info.id}" class="cta-btn" style="
         display:inline-block; 
-        padding:8px 16px; 
-        background:#ff6347; 
+        padding:10px 20px; 
+        background:${vibeColor(info.vibe)}; 
         color:#fff; 
         text-decoration:none; 
         border-radius:6px;
         font-weight:bold;
+        text-align:center;
+        margin-top:10px;
       ">View Details</a>
     </div>
   `;
 
   classesList.appendChild(div);
 });
+
+// Responsive adjustments via JS (optional if no CSS media queries)
+document.querySelectorAll(".class-card").forEach(card => {
+  card.style.width = "100%";
+  card.style.maxWidth = "400px";
+  card.style.margin = "10px auto";
+});
+
 
 }
 
