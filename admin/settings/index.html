@@ -262,7 +262,7 @@ async function loadSettings() {
       aboutEditor.root.innerHTML = data.about || "";
 
       contactInfo.value = data.contact || "";
-      
+
 mainMerchPreview.src = data.mainMerchImage || "";
 showMerchOnHome.checked = data.showMerchOnHome || false;
 
@@ -324,7 +324,7 @@ const settingsData = {
     await updateDoc(settingsDoc, settingsData).catch(async () => {
       await setDoc(settingsDoc, settingsData);
     });
-    alert("Settings saved!");
+    showToast("Settings saved!");
   } catch(err) {
     console.error("Error saving settings:", err);
   }
