@@ -144,6 +144,8 @@ function renderClasses(docs) {
   const grouped = {};
   docs.forEach((docSnap) => {
     const data = docSnap.data();
+    console.log("data: ",data);
+    
     if (!grouped[data.name]) {
       grouped[data.name] = {
         description: data.description,
