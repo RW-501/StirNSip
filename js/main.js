@@ -166,7 +166,7 @@ grouped[data.name].times.push(data.time);
     // Make badges for each time
     const timesHtml = info.times
       .map(
-        t => `<span class="time-badge">${t.date} @ ${t.time}</span>`
+        t => `<span class="time-badge">${info.date} @ ${info.time}</span>`
       )
       .join(" ");
 
