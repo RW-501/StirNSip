@@ -879,16 +879,10 @@ function renderTable() {
   const filterClass = budgetFilterClass.value;
   budgetTableBody.innerHTML = "";
 
-  let globalTotals = {
-    est: 0,
-    actual: 0,
-    ticket: 0,
-    venue: 0,
-    profit: 0
-  };
+  let globalTotals = { est: 0, actual: 0, ticket: 0, venue: 0, profit: 0 };
+  const grouped = {};
 
   // group by className
-  const grouped = {};
   budgetData.forEach(item => {
     if (searchText && !item.item.toLowerCase().includes(searchText)) return;
     if (filterClass && item.classId !== filterClass) return;
@@ -901,12 +895,13 @@ function renderTable() {
     // insert header row for class
     const headerRow = document.createElement("tr");
     headerRow.classList.add("classHeader");
+    headerRow.style.cursor = "pointer";
+    headerRow.style.background = "#f4f4f4";
+    headerRow.style.fontWeight = "bold";
     headerRow.innerHTML = `
-      <td colspan="13" style="background:#f4f4f4;font-weight:bold;cursor:pointer;">
-        ${className || "Unassigned"} (Click to collapse/expand)
-      </td>`;
+      <td colspan="13">${className || "Unassigned"} (Click to collapse/expand)</td>`;
     headerRow.addEventListener("click", () => {
-      const next = headerRow.nextSibling;
+      let next = headerRow.nextSibling;
       while (next && !next.classList.contains("classHeader")) {
         next.classList.toggle("hiddenRow");
         next = next.nextSibling;
@@ -914,62 +909,95 @@ function renderTable() {
     });
     budgetTableBody.appendChild(headerRow);
 
-    // per-class totals
     let classTotals = { est: 0, actual: 0, ticket: 0, venue: 0, profit: 0 };
+items.forEach(item => {
+  const profit = (item.ticketCost || 0) - ((item.actualCost || 0) + (item.venueCost || 0));
+  const margin = item.ticketCost ? ((profit / item.ticketCost) * 100).toFixed(1) + "%" : "—";
 
-    items.forEach(item => {
-      const profit = (item.ticketCost || 0) - ((item.actualCost || 0) + (item.venueCost || 0));
-      const margin = item.ticketCost ? ((profit / item.ticketCost) * 100).toFixed(1) + "%" : "—";
+  // Update class and global totals
+  ["est", "actual", "ticket", "venue", "profit"].forEach(key => {
+    const val = key === "est" ? item.estimatedCost || 0
+              : key === "actual" ? item.actualCost || 0
+              : key === "ticket" ? item.ticketCost || 0
+              : key === "venue" ? item.venueCost || 0
+              : profit;
+    classTotals[key] += val;
+    globalTotals[key] += val;
+  });
 
-      classTotals.est += item.estimatedCost || 0;
-      classTotals.actual += item.actualCost || 0;
-      classTotals.ticket += item.ticketCost || 0;
-      classTotals.venue += item.venueCost || 0;
-      classTotals.profit += profit;
+  const tr = document.createElement("tr");
+  tr.dataset.id = item.id;
+  tr.style.transition = "background 0.2s";
 
-      globalTotals.est += item.estimatedCost || 0;
-      globalTotals.actual += item.actualCost || 0;
-      globalTotals.ticket += item.ticketCost || 0;
-      globalTotals.venue += item.venueCost || 0;
-      globalTotals.profit += profit;
+  // Highlight row if over budget
+  if(item.actualCost > item.estimatedCost){
+    tr.classList.add("overBudget");
+  }
 
-      const tr = document.createElement("tr");
-      tr.dataset.id = item.id;
+  // Hover effect
+  tr.addEventListener("mouseenter", () => tr.style.background = "#f9f9f9");
+  tr.addEventListener("mouseleave", () => tr.style.background = "");
 
-      tr.innerHTML = `
-        <td>${item.className || "N/A"}</td>
-        <td><input type="checkbox" class="liveStatus" ${item.live ? "checked" : ""}></td>
-        <td contenteditable class="itemName">${item.item || ""}</td>
-        <td contenteditable class="estCost">${item.estimatedCost || 0}</td>
-        <td contenteditable class="actualCost">${item.actualCost || 0}</td>
-        <td contenteditable class="ticketCost">${item.ticketCost || 0}</td>
-        <td contenteditable class="venueCost">${item.venueCost || 0}</td>
-        <td>${profit.toFixed(2)}</td>
-        <td>${margin}</td>
-        <td class="linksCell">${(item.links || []).map(l=>`<a href="${l}" target="_blank">Link</a>`).join("<br>")} <button class="editLinks">Edit</button></td>
-        <td class="picsCell">${(item.pictures || []).map(img=>`<img src="${img}" width="50"/>`).join("")} <button class="editPics">Add</button></td>
-        <td>
-          <select class="priority">
-            <option ${item.priority==="High"?"selected":""}>High</option>
-            <option ${item.priority==="Medium"?"selected":""}>Medium</option>
-            <option ${item.priority==="Low"?"selected":""}>Low</option>
-          </select>
-        </td>
-        <td><button class="editNotes">Edit</button></td>
-        <td><button class="deleteItem">Delete</button></td>
-      `;
+  // Determine profit color
+  let profitColor = "green";
+  if(profit < 0) profitColor = "red";
+  else if(item.ticketCost && profit/item.ticketCost < 0.1) profitColor = "orange";
 
-      // Event listeners
+  tr.innerHTML = `
+    <td>${item.className || "N/A"}</td>
+    <td><input type="checkbox" class="liveStatus" ${item.live ? "checked" : ""}></td>
+    <td contenteditable class="itemName">${item.item || ""}</td>
+    <td contenteditable class="estCost">${(item.estimatedCost || 0).toFixed(2)}</td>
+    <td contenteditable class="actualCost">${(item.actualCost || 0).toFixed(2)}</td>
+    <td contenteditable class="ticketCost">${(item.ticketCost || 0).toFixed(2)}</td>
+    <td contenteditable class="venueCost">${(item.venueCost || 0).toFixed(2)}</td>
+    <td style="color:${profitColor}">${profit.toFixed(2)}</td>
+    <td style="color:${profitColor}">${margin}</td>
+    <td class="linksCell">${(item.links || []).map(l=>`<a href="${l}" target="_blank">Link</a>`).join("<br>")} <button class="editLinks">Edit</button></td>
+    <td class="picsCell">${(item.pictures || []).map(img=>`<img src="${img}" width="50"/>`).join("")} <button class="editPics">Add</button></td>
+    <td>
+      <select class="priority">
+        <option ${item.priority==="High"?"selected":""}>High</option>
+        <option ${item.priority==="Medium"?"selected":""}>Medium</option>
+        <option ${item.priority==="Low"?"selected":""}>Low</option>
+      </select>
+    </td>
+    <td><button class="editNotes">Edit</button></td>
+    <td><button class="deleteItem">Delete</button></td>
+  `;
+
+
+// Unified editable cells listener
+["itemName","estCost","actualCost","ticketCost","venueCost"].forEach(cls => {
+  const cell = tr.querySelector(`.${cls}`);
+  cell?.addEventListener("blur", async e => {
+    let val;
+    let fieldName;
+
+    if(cls === "itemName") {
+      val = e.target.textContent;
+      fieldName = "item";
+    } else {
+      val = parseFloat(e.target.textContent) || 0;
+      e.target.textContent = val.toFixed(2); // enforce 2 decimals
+      fieldName = cls === "estCost" ? "estimatedCost" 
+                : cls === "actualCost" ? "actualCost" 
+                : cls === "ticketCost" ? "ticketCost" 
+                : "venueCost";
+    }
+
+    await updateDoc(doc(db, "budgets", item.id), { [fieldName]: val });
+
+    // flash background to indicate save
+    tr.style.background = "#d4edda";
+    setTimeout(() => tr.style.background = "", 300);
+  });
+});
+
+            // Event listeners
       tr.querySelector(".liveStatus")?.addEventListener("change", async e => {
         await updateDoc(doc(db, "budgets", item.id), { live: e.target.checked });
         showToast("Live status updated");
-      });
-
-      ["itemName","estCost","actualCost","ticketCost","venueCost"].forEach(cls => {
-        tr.querySelector(`.${cls}`)?.addEventListener("blur", async e => {
-          let val = cls.includes("Cost") ? parseFloat(e.target.textContent) || 0 : e.target.textContent;
-          await updateDoc(doc(db, "budgets", item.id), { [cls==="itemName"?"item":cls==="estCost"?"estimatedCost":cls==="actualCost"?"actualCost":cls==="ticketCost"?"ticketCost":"venueCost"]: val });
-        });
       });
 
       tr.querySelector(".priority")?.addEventListener("change", async e => {
@@ -992,33 +1020,32 @@ function renderTable() {
 tr.querySelector(".editPics")?.addEventListener("click", () => openGalleryPicker(item.id));
 
 
-
-      tr.querySelector(".editPics")?.addEventListener("click", () => {
-        const url = prompt("Add image URL:");
-        if (!url) return;
-        item.pictures = item.pictures || [];
-        item.pictures.push(url);
-        updateDoc(doc(db, "budgets", item.id), { pictures: item.pictures });
-        showToast("Picture added!");
-      });
-
       budgetTableBody.appendChild(tr);
     });
 
-    // add subtotal row for class
-    const subtotalRow = document.createElement("tr");
-    subtotalRow.classList.add("classSubtotal");
-    subtotalRow.innerHTML = `
-      <td colspan="3" style="font-weight:bold;background:#fafafa;">${className} Totals</td>
-      <td>${classTotals.est.toFixed(2)}</td>
-      <td>${classTotals.actual.toFixed(2)}</td>
-      <td>${classTotals.ticket.toFixed(2)}</td>
-      <td>${classTotals.venue.toFixed(2)}</td>
-      <td>${classTotals.profit.toFixed(2)}</td>
-      <td>${classTotals.ticket ? ((classTotals.profit/classTotals.ticket)*100).toFixed(1)+"%" : "—"}</td>
-      <td colspan="5"></td>
-    `;
-    budgetTableBody.appendChild(subtotalRow);
+// class subtotal
+const subtotalRow = document.createElement("tr");
+subtotalRow.classList.add("classSubtotal");
+subtotalRow.style.background = "#fafafa";
+subtotalRow.style.fontWeight = "bold";
+
+// determine color for subtotal profit
+let subtotalProfitColor = classTotals.profit < 0 ? "red" 
+                         : (classTotals.ticket && classTotals.profit/classTotals.ticket < 0.1 ? "orange" 
+                         : "green");
+
+subtotalRow.innerHTML = `
+  <td colspan="3">${className} Totals</td>
+  <td>${classTotals.est.toFixed(2)}</td>
+  <td>${classTotals.actual.toFixed(2)}</td>
+  <td>${classTotals.ticket.toFixed(2)}</td>
+  <td>${classTotals.venue.toFixed(2)}</td>
+  <td style="color:${subtotalProfitColor}">${classTotals.profit.toFixed(2)}</td>
+  <td style="color:${subtotalProfitColor}">${classTotals.ticket ? ((classTotals.profit/classTotals.ticket)*100).toFixed(1)+"%" : "—"}</td>
+  <td colspan="5"></td>
+`;
+budgetTableBody.appendChild(subtotalRow);
+
   });
 
   // update global footer totals

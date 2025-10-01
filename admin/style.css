@@ -211,3 +211,17 @@ main {
 .hidden {
   display: none;
 }
+
+#budgetTable thead th {
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+}
+
+/* CSS */
+.hiddenRow { display: none; }
+#budgetTable thead th { position: sticky; top: 0; background: #fff; z-index: 10; }
+.classSubtotal { position: sticky; bottom: 30px; background: #fafafa; z-index: 5; border-top: 2px solid #ccc; }
+.globalTotals { position: sticky; bottom: 0; background: #ddd; font-weight: bold; }
+.overBudget { background: #fff2f2; transition: background 0.3s; }
