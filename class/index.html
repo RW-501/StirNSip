@@ -290,35 +290,56 @@ if (data.dateTimes && data.dateTimes.length) {
     // --- LOAD UPCOMING CLASSES ---
 async function loadUpcomingClasses() {
   const classesList = document.getElementById("classesList");
+  classesList.innerHTML = ""; // clear existing
+
   try {
-    const q = query(collection(db, "classes"), orderBy("firstDate", "asc"), where("active", "==", true));
+    // Firestore requires 'where' before 'orderBy'
+    const q = query(
+      collection(db, "classes"),
+      where("active", "==", true),
+      orderBy("firstDate", "asc")
+    );
+
     const snapshot = await getDocs(q);
-console.log("loadUpcomingClasses snapshot: ",snapshot);
+    console.log("loadUpcomingClasses snapshot: ", snapshot);
 
+    if (snapshot.empty) {
+      classesList.innerHTML = "<p>No upcoming classes.</p>";
+      return;
+    }
 
-snapshot.forEach((docSnap, index) => {
-  const data = docSnap.data();
-      console.log("Classes data: ",data);
+    snapshot.forEach((docSnap, index) => {
+      const data = docSnap.data();
+      console.log("Classes data: ", data);
 
-  const div = document.createElement("div");
-  div.classList.add("class-card", "animate-card");
-  div.style.animationDelay = `${index * 0.1}s`; // stagger each card
-  div.innerHTML = `
-    ${data.featured ? '<div class="featured-badge">Featured</div>' : ''}
-    <img src="${data.coverImage || ''}" alt="${data.name}" style="width:100%;border-radius:10px;object-fit:cover;height:160px;">
-    <div class="card-overlay">
-      <p>${data.description?.slice(0, 100) || ''}...</p>
-    </div>
-    <h3>${data.name}</h3>
-    <p>${formatDate(data.firstDate)} | ${data.time || 'TBD'}</p>
-    <p>Price: $${data.singlesCost?.toFixed(2) || 0}</p>
-    <a href="/class.html?id=${docSnap.id}" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">View Details</a>
-  `;
-  classesList.appendChild(div);
-});
+      // If firstDate is string, convert to Date object for formatting
+      const firstDate = data.firstDate ? new Date(data.firstDate) : null;
+      const dateStr = firstDate ? firstDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD";
 
-  } catch(err){ console.error(err); showToast("Error loading classes"); }
+      const div = document.createElement("div");
+      div.classList.add("class-card", "animate-card");
+      div.style.animationDelay = `${index * 0.1}s`; // stagger each card
+
+      div.innerHTML = `
+        ${data.featured ? '<div class="featured-badge">Featured</div>' : ''}
+        <img src="${data.coverImage || ''}" alt="${data.name}" style="width:100%;border-radius:10px;object-fit:cover;height:160px;">
+        <div class="card-overlay">
+          <p>${data.description?.slice(0, 100) || ''}...</p>
+        </div>
+        <h3>${data.name}</h3>
+        <p>${dateStr} | ${data.time || 'TBD'}</p>
+        <p>Price: $${data.singlesCost?.toFixed(2) || 0}</p>
+        <a href="/class.html?id=${docSnap.id}" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">View Details</a>
+      `;
+      classesList.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error(err);
+    showToast("Error loading classes");
+  }
 }
+
 
 // --- LOAD MERCH ---
 async function loadMerch() {
