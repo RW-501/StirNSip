@@ -234,12 +234,12 @@ if (data.dateTimes && data.dateTimes.length) {
 
 
         elements.classDescriptionEl.textContent = data.description;
-        elements.classVibeEl.textContent = `Vibe: ${data.vibe || "N/A"}`;
-        elements.classSizeEl.textContent = `Size: ${data.classSize || 0}`;
-        elements.spotsAvailableEl.textContent = `Spots Available: ${data.spotsAvailable || 0}`;
-        elements.singlesCostEl.textContent = `Singles: $${data.singlesCost?.toFixed(2) || 0}`;
-        elements.couplesCostEl.textContent = `Couples: $${data.couplesCost?.toFixed(2) || 0}`;
-        elements.whatCookingEl.textContent = `What We’re Cooking: ${data.whatCooking || "TBD"}`;
+        elements.classVibeEl.textContent = `${data.vibe || "N/A"}`;
+        elements.classSizeEl.textContent = `${data.classSize || 0}`;
+        elements.spotsAvailableEl.textContent = `${data.spotsAvailable || 0}`;
+        elements.singlesCostEl.textContent = `$${data.singlesCost?.toFixed(2) || 0}`;
+        elements.couplesCostEl.textContent = `$${data.couplesCost?.toFixed(2) || 0}`;
+        elements.whatCookingEl.textContent = `${data.whatCooking || "TBD"}`;
         elements.recipeContentEl.innerHTML = data.recipe || "<p>Recipe coming soon!</p>";
 
         elements.eventbriteBtn.href = data.eventbriteLink || "#";
