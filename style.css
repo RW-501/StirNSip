@@ -183,13 +183,13 @@ section {
     border-color: var(--color-secondary);
     transform: translateY(-2px);
 }
-
+/*
 #aboutSection {
     background-color: rgb(255 136 68 / 35%);
     border: solid #aa7d6770;
     border-radius: 2rem;
 }
-
+*/
 /* 5. CLASSES & GALLERY GRIDS */
 .class-grid, .gallery-grid {
     display: grid;
