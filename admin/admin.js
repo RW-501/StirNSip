@@ -491,20 +491,25 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     classCoverSelect.appendChild(classImg);
 
     // --- Cover selection for merch ---
-    const merchImg = document.createElement("img");
-    merchImg.src = data.url;
-    merchImg.alt = data.group || "Gallery";
-    merchImg.style.width = "80px";
-    merchImg.style.margin = "5px";
-    merchImg.style.cursor = "pointer";
-    merchImg.style.border = "2px solid transparent";
+const merchImg = document.createElement("img");
+merchImg.src = data.url;
+merchImg.alt = data.group || "Gallery";
+merchImg.style.width = "80px";
+merchImg.style.margin = "5px";
+merchImg.style.cursor = "pointer";
+merchImg.style.border = "2px solid transparent";
 
-    merchImg.addEventListener("click", () => {
-      document.querySelectorAll("#merchCoverOptions img").forEach(i => i.style.border = "2px solid transparent");
-      merchImg.style.border = "2px solid blue";
-      merchCoverPreview.src = data.url;
-    });
-    merchCoverOptions.appendChild(merchImg);
+// Toggle select instead of single
+merchImg.addEventListener("click", () => {
+  merchImg.classList.toggle("selected");
+  merchImg.style.border = merchImg.classList.contains("selected") 
+    ? "2px solid blue" 
+    : "2px solid transparent";
+});
+
+// Append
+merchCoverOptions.appendChild(merchImg);
+
 
     
     // Initialize popup for all gallery images
@@ -762,17 +767,20 @@ async function loadMerch() {
       const m = docSnap.data();
       const div = document.createElement("div");
       div.className = "merch-item";
-      div.innerHTML = `
-        <h4>${m.name}</h4>
-        <img src="${m.coverImage || ''}" style="max-width:100px;">
-        <p>${m.description}</p>
-        <p><strong>Cost:</strong> $${m.cost?.toFixed(2) || 0}</p>
-        <p><strong>Available:</strong> ${m.available}</p>
-        <p><strong>Link:</strong> ${m.link ? `<a href="${m.link}" target="_blank">Buy</a>` : "<em>Coming Soon</em>"}</p>
-        <p><strong>Visible:</strong> ${m.visible ? "Yes" : "No"}</p>
-        <button data-id="${docSnap.id}" class="edit-merch">Edit</button>
-        <button data-id="${docSnap.id}" class="delete-merch">Delete</button>
-      `;
+div.innerHTML = `
+  <h4>${m.name}</h4>
+  <div class="merch-images">
+    ${(m.images || []).map(url => `<img src="${url}" style="max-width:80px; margin:3px;">`).join("")}
+  </div>
+  <p>${m.description}</p>
+  <p><strong>Cost:</strong> $${m.cost?.toFixed(2) || 0}</p>
+  <p><strong>Available:</strong> ${m.available}</p>
+  <p><strong>Link:</strong> ${m.link ? `<a href="${m.link}" target="_blank">Buy</a>` : "<em>Coming Soon</em>"}</p>
+  <p><strong>Visible:</strong> ${m.visible ? "Yes" : "No"}</p>
+  <button data-id="${docSnap.id}" class="edit-merch">Edit</button>
+  <button data-id="${docSnap.id}" class="delete-merch">Delete</button>
+`;
+
       merchList.appendChild(div);
     });
 
@@ -807,9 +815,11 @@ autoProcessing(merchForm, "Saving...");
   const available = parseInt(document.getElementById("merchAvailable").value) || 0;
   const link = document.getElementById("merchLink").value || "";
   const visible = document.getElementById("merchVisible").checked;
-  const coverImage = merchCoverPreview.src || "";
+// Collect all selected images
+const images = Array.from(document.querySelectorAll("#merchCoverOptions img.selected"))
+  .map(img => img.src);
 
-  const merchData = { name, description, cost, available, link, visible, coverImage };
+const merchData = { name, description, cost, available, link, visible, images };
   
   try {
     if (id) {
@@ -830,6 +840,7 @@ async function editMerch(id) {
   const docSnap = await getDoc(doc(db, "merch", id));
   if (!docSnap.exists()) return;
   const m = docSnap.data();
+
   document.getElementById("merchId").value = id;
   document.getElementById("merchName").value = m.name || "";
   document.getElementById("merchDescription").value = m.description || "";
@@ -837,14 +848,33 @@ async function editMerch(id) {
   document.getElementById("merchAvailable").value = m.available || 0;
   document.getElementById("merchLink").value = m.link || "";
   document.getElementById("merchVisible").checked = m.visible || false;
-  merchCoverPreview.src = m.coverImage || "";
+
+  // Reset all image selections
+  merchCoverOptions.querySelectorAll("img").forEach(img => {
+    if ((m.images || []).includes(img.src)) {
+      img.classList.add("selected");
+      img.style.border = "2px solid blue";
+    } else {
+      img.classList.remove("selected");
+      img.style.border = "2px solid transparent";
+    }
+  });
+
+  // Set preview to first image (if any)
+  merchCoverPreview.src = (m.images && m.images[0]) || "";
 }
+
 
 // Cancel edit
 cancelMerchEdit.addEventListener("click", () => {
   merchForm.reset();
   merchCoverPreview.src = "";
+  merchCoverOptions.querySelectorAll("img").forEach(img => {
+    img.classList.remove("selected");
+    img.style.border = "2px solid transparent";
+  });
 });
+
 
 
 // budgetPlanner.js
