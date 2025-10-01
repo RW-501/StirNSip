@@ -250,40 +250,35 @@ autoProcessing(classForm, "Saving...");
 
 
   // Collect multiple dates/times
-const dateTimes = {};
+// Get the single date
+const date = document.querySelector(".classDate").value;
 
-document.querySelectorAll(".date-time-group").forEach(group => {
-  const date = group.querySelector(".classDate").value;
-  const time = group.querySelector(".classTime").value;
-
-  if (date && time) {
-    if (!dateTimes[date]) {
-      dateTimes[date] = []; // create an array for this date
-    }
-    dateTimes[date].push(time);
-  }
+// Collect all times
+const times = [];
+document.querySelectorAll(".classTime").forEach(input => {
+  const time = input.value;
+  if (time) times.push(time);
 });
 
-// Convert to array of objects if you prefer
-//const result = Object.entries(dateTimes).map(([date, times]) => ({ date, times }));
+// Structure it consistently
+const dateTimes = [{ date, times }];
 
-
-  const classData = {
-    name,
-    description,
-    recipe,
-    whatCooking,
-    visible,
-    singlesCost,
-    couplesCost,
-    classSize: size,
-    spotsAvailable: spots,
-    vibe,
-    coverImage,
-    secondLink,
-    eventbriteLink,
-    dateTimes: dateTimes
-  };
+const classData = {
+  name,
+  description,
+  recipe,
+  whatCooking,
+  visible,
+  singlesCost,
+  couplesCost,
+  classSize: size,
+  spotsAvailable: spots,
+  vibe,
+  coverImage,
+  secondLink,
+  eventbriteLink,
+  dateTimes
+};
 
   try {
     if (id) {
