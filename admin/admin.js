@@ -802,3 +802,210 @@ cancelMerchEdit.addEventListener("click", () => {
   merchForm.reset();
   merchCoverPreview.src = "";
 });
+
+
+
+import { collection, getDocs, addDoc, updateDoc, doc, deleteDoc, onSnapshot } from "firebase/firestore";
+import { db } from "./firebase.js"; // your Firebase config
+import { showToast } from "./toast.js"; // your toast module
+
+const budgetTableBody = document.querySelector("#budgetTable tbody");
+const addBudgetItemBtn = document.getElementById("addBudgetItemBtn");
+const budgetSearch = document.getElementById("budgetSearch");
+const budgetFilterClass = document.getElementById("budgetFilterClass");
+const notesPopup = document.getElementById("budgetNotesPopup");
+const budgetNotesText = document.getElementById("budgetNotesText");
+const saveBudgetNotesBtn = document.getElementById("saveBudgetNotesBtn");
+const closeBudgetNotesBtn = document.getElementById("closeBudgetNotesBtn");
+
+let currentNotesId = null;
+
+// Load classes into filter
+async function loadClassFilter() {
+  const snapshot = await getDocs(collection(db, "classes"));
+  snapshot.forEach(docSnap => {
+    const cls = docSnap.data();
+    const option = document.createElement("option");
+    option.value = docSnap.id;
+    option.textContent = cls.name;
+    budgetFilterClass.appendChild(option);
+  });
+}
+
+// Load budget items live
+function loadBudgetItems() {
+  onSnapshot(collection(db, "budgets"), snapshot => {
+    budgetTableBody.innerHTML = "";
+    let totalEst = 0, totalActual = 0, totalTicket = 0, totalVenue = 0, totalProfit = 0;
+
+    snapshot.docs.forEach(docSnap => {
+      const data = docSnap.data();
+      const tr = document.createElement("tr");
+
+      const profit = (data.ticketCost || 0) - ((data.actualCost || 0) + (data.venueCost || 0));
+      totalEst += data.estimatedCost || 0;
+      totalActual += data.actualCost || 0;
+      totalTicket += data.ticketCost || 0;
+      totalVenue += data.venueCost || 0;
+      totalProfit += profit;
+
+      tr.innerHTML = `
+        <td>${data.className || "N/A"}</td>
+        <td><input type="checkbox" class="liveStatus" ${data.live ? "checked" : ""}></td>
+        <td contenteditable class="itemName">${data.item || ""}</td>
+        <td contenteditable class="estCost">${data.estimatedCost || 0}</td>
+        <td contenteditable class="actualCost">${data.actualCost || 0}</td>
+        <td contenteditable class="ticketCost">${data.ticketCost || 0}</td>
+        <td contenteditable class="venueCost">${data.venueCost || 0}</td>
+        <td>${profit.toFixed(2)}</td>
+        <td>${(data.links || []).map(l => `<a href="${l}" target="_blank">Link</a>`).join("<br>")}</td>
+        <td>${(data.pictures || []).map(img => `<img src="${img}" width="50"/>`).join("")}</td>
+        <td>
+          <select class="priority">
+            <option ${data.priority==="High"?"selected":""}>High</option>
+            <option ${data.priority==="Medium"?"selected":""}>Medium</option>
+            <option ${data.priority==="Low"?"selected":""}>Low</option>
+          </select>
+        </td>
+        <td><button class="editNotes">Edit</button></td>
+        <td><button class="deleteItem">Delete</button></td>
+      `;
+
+      // Event listeners
+      tr.querySelector(".liveStatus").addEventListener("change", async e => {
+        await updateDoc(doc(db, "budgets", docSnap.id), { live: e.target.checked });
+        showToast("Live status updated");
+      });
+
+      tr.querySelector(".itemName").addEventListener("blur", async e => {
+        await updateDoc(doc(db, "budgets", docSnap.id), { item: e.target.textContent });
+      });
+
+      tr.querySelector(".estCost").addEventListener("blur", async e => {
+        const val = parseFloat(e.target.textContent) || 0;
+        await updateDoc(doc(db, "budgets", docSnap.id), { estimatedCost: val });
+      });
+
+      tr.querySelector(".actualCost").addEventListener("blur", async e => {
+        const val = parseFloat(e.target.textContent) || 0;
+        await updateDoc(doc(db, "budgets", docSnap.id), { actualCost: val });
+      });
+
+      tr.querySelector(".ticketCost").addEventListener("blur", async e => {
+        const val = parseFloat(e.target.textContent) || 0;
+        await updateDoc(doc(db, "budgets", docSnap.id), { ticketCost: val });
+      });
+
+      tr.querySelector(".venueCost").addEventListener("blur", async e => {
+        const val = parseFloat(e.target.textContent) || 0;
+        await updateDoc(doc(db, "budgets", docSnap.id), { venueCost: val });
+      });
+
+      tr.querySelector(".priority").addEventListener("change", async e => {
+        await updateDoc(doc(db, "budgets", docSnap.id), { priority: e.target.value });
+      });
+
+      tr.querySelector(".editNotes").addEventListener("click", () => {
+        currentNotesId = docSnap.id;
+        budgetNotesText.value = data.notes || "";
+        notesPopup.classList.remove("hidden");
+      });
+
+      tr.querySelector(".deleteItem").addEventListener("click", async () => {
+        if (!confirm("Delete this item?")) return;
+        await deleteDoc(doc(db, "budgets", docSnap.id));
+        showToast("Item deleted!");
+      });
+
+      budgetTableBody.appendChild(tr);
+    });
+
+    // Update totals
+    document.getElementById("totalEstCost").textContent = totalEst.toFixed(2);
+    document.getElementById("totalActualCost").textContent = totalActual.toFixed(2);
+    document.getElementById("totalTicketCost").textContent = totalTicket.toFixed(2);
+    document.getElementById("totalVenueCost").textContent = totalVenue.toFixed(2);
+    document.getElementById("totalProfit").textContent = totalProfit.toFixed(2);
+  });
+}
+
+// Notes popup buttons
+saveBudgetNotesBtn.addEventListener("click", async () => {
+  if (!currentNotesId) return;
+  await updateDoc(doc(db, "budgets", currentNotesId), { notes: budgetNotesText.value });
+  showToast("Notes saved");
+  notesPopup.classList.add("hidden");
+});
+
+closeBudgetNotesBtn.addEventListener("click", () => {
+  notesPopup.classList.add("hidden");
+});
+
+// Add new budget item
+addBudgetItemBtn.addEventListener("click", async () => {
+  const newItem = {
+    className: "",
+    live: false,
+    item: "",
+    estimatedCost: 0,
+    actualCost: 0,
+    ticketCost: 0,
+    venueCost: 0,
+    links: [],
+    pictures: [],
+    priority: "Medium",
+    notes: ""
+  };
+  await addDoc(collection(db, "budgets"), newItem);
+  showToast("Budget item added");
+});
+
+// Initialize
+loadClassFilter();
+loadBudgetItems();
+
+
+
+
+
+function setupAdminNav() {
+  const navButtons = document.querySelectorAll("#adminNav button[data-target]");
+  const showAllBtn = document.getElementById("showAllSections");
+
+  navButtons.forEach(btn => {
+    const targetSelector = btn.dataset.target;
+    const targetEl = document.querySelector(targetSelector);
+    if (!targetEl) return;
+
+    btn.addEventListener("click", () => {
+      // Hide all sections first
+      document.querySelectorAll("section, form#class-form").forEach(sec => {
+        sec.style.display = "none";
+      });
+      // Show only this section
+      targetEl.style.display = "block";
+    });
+  });
+
+  // Show all sections button
+  showAllBtn.addEventListener("click", () => {
+    document.querySelectorAll("section, form#class-form").forEach(sec => {
+      sec.style.display = "block";
+    });
+  });
+
+  // Optional: hide all sections on page load except first
+  document.querySelectorAll("section, form#class-form").forEach((sec, i) => {
+    sec.style.display = i === 0 ? "block" : "none";
+  });
+}
+
+// Call this after DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  setupAdminNav();
+});
+
+    import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
+
+  // Initialize popup for all gallery images
+  initImagePopup('img');

@@ -3,6 +3,7 @@
 
 import { showToast } from 'https://rw-501.github.io/StirNSip/js/showToast.js';
 
+
     const firebaseConfig = { 
       apiKey: "AIzaSyBlN_vkUzQMfsCSFttdKA2ZMNz8v26JrQ8",
       authDomain: "stirnsip-978dc.firebaseapp.com",
@@ -203,3 +204,8 @@ onSnapshot(query(collection(db, "merch"), where("visible", "==", true)), snapsho
     // Update year
     document.getElementById("year").textContent = new Date().getFullYear();
  
+
+    import { initImagePopup } from 'https://rw-501.github.io/StirNSip/js/imagePopup.js';
+
+  // Initialize popup for all gallery images
+  initImagePopup('img');

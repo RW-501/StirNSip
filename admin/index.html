@@ -42,6 +42,15 @@
 
     <h1>Admin Dashboard</h1>
 
+    <nav id="adminNav" style="margin-bottom:1rem;">
+  <button data-target="#class-form">Classes</button>
+  <button data-target="#gallery-section">Gallery</button>
+  <button data-target="#admin-merch-section">Merch</button>
+  <button data-target="#budget-section">Budget</button>
+  <button id="showAllSections">Show All</button>
+</nav>
+
+
 <!-- ADD / EDIT CLASS FORM -->
 <form id="class-form">
   <input type="hidden" id="classId" />
@@ -196,6 +205,56 @@
 
 
 
+<section id="budget-section">
+  <h2>Budget & Class Planner</h2>
+
+  <div class="budget-controls">
+    <input type="text" id="budgetSearch" placeholder="Search items...">
+    <select id="budgetFilterClass">
+      <option value="">All Classes</option>
+    </select>
+    <button id="addBudgetItemBtn">Add Item</button>
+  </div>
+
+  <table id="budgetTable">
+    <thead>
+      <tr>
+        <th>Class</th>
+        <th>Live</th>
+        <th>Item / Task</th>
+        <th>Est. Cost</th>
+        <th>Actual Cost</th>
+        <th>Ticket Cost</th>
+        <th>Venue Cost</th>
+        <th>Profit</th>
+        <th>Links</th>
+        <th>Pictures</th>
+        <th>Priority</th>
+        <th>Notes</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3"><strong>Totals</strong></td>
+        <td id="totalEstCost">0</td>
+        <td id="totalActualCost">0</td>
+        <td id="totalTicketCost">0</td>
+        <td id="totalVenueCost">0</td>
+        <td id="totalProfit">0</td>
+        <td colspan="5"></td>
+      </tr>
+    </tfoot>
+  </table>
+</section>
+
+<!-- Notes/Task Popup -->
+<div id="budgetNotesPopup" class="popup hidden">
+  <textarea id="budgetNotesText" rows="4"></textarea>
+  <button id="saveBudgetNotesBtn">Save</button>
+  <button id="closeBudgetNotesBtn">Close</button>
+</div>
 
 </div>
 
