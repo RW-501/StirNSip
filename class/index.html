@@ -331,7 +331,7 @@ async function loadUpcomingClasses() {
         <h3>${data.name}</h3>
         <p>${dateStr} | ${data.time || 'TBD'}</p>
         <p>Price: $${data.singlesCost?.toFixed(2) || 0}</p>
-        <a href="/class.html?id=${docSnap.id}" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">View Details</a>
+        <a href="https://rw-501.github.io/StirNSip/class/index.html?id=${docSnap.id}" class="cta-btn" style="width:100%;text-align:center;margin-top:0.5rem;">View Details</a>
       `;
       classesList.appendChild(div);
     });
