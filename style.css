@@ -52,14 +52,15 @@ h1 { font-size: 3rem; }
 h2 {
     font-size: 2.5rem;
     border-left: #ff8844 solid;
-    border-right: #ff8844 solid;
+    border-right: #000 solid;
     border-width: thick;
     padding-left: .2rem;
     width: fit-content;
-    padding-right: .2rem;
-    background: linear-gradient(90deg, #ff8844, #000000cc);
+    padding-right: 3rem;
+    background: linear-gradient(90deg, #ff8844, #000000d1);
     border-radius: .5rem;
     color: antiquewhite;
+    box-shadow: 3px 1px 11px 1px rgb(0 0 0 / 80%);
 }
 
 h3 { font-size: 1.75rem; }
