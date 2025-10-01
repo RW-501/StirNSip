@@ -299,8 +299,7 @@ async function loadUpcomingClasses() {
     // Firestore requires 'where' before 'orderBy'
     const q = query(
       collection(db, "classes"),
-      where("active", "==", true),
-      orderBy("firstDate", "asc")
+      where("active", "==", true)
     );
 
     const snapshot = await getDocs(q);
@@ -407,7 +406,7 @@ async function loadMerch() {
     
   // Initialize popup for all gallery images
   initImagePopup('img');
-  
+
   } catch(err) { 
     console.error(err); 
     showToast("Error loading merch"); 
