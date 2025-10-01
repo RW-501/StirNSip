@@ -474,3 +474,115 @@ footer {
 .merch-thumbs img:hover {
   border: 2px solid #007BFF; /* highlight */
 }
+
+/* Grid layout for merch */
+.merch-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px; /* space between cards */
+  padding: 10px;
+}
+
+/* Card styling */
+.merch-card {
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 15px;
+  margin: 10px;
+  text-align: center;
+  max-width: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+  background: #fff;
+}
+
+/* Card hover effect */
+.merch-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* Main merch image */
+.merch-main-img {
+  width: 100%;
+  max-height: 180px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.merch-main-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.3s ease;
+}
+
+.merch-main-img img:hover {
+  transform: scale(1.05);
+}
+
+/* Thumbnail images */
+.merch-thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.merch-thumbs img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border 0.2s ease;
+}
+
+.merch-thumbs img.active,
+.merch-thumbs img:hover {
+  border: 2px solid #007BFF; /* highlight */
+}
+
+/* Text and CTA */
+.merch-card h4 {
+  font-size: 1.1rem;
+  margin: 8px 0 5px 0;
+  min-height: 2.5em; /* keeps title space consistent */
+}
+
+.merch-card p {
+  font-size: 0.9rem;
+  margin: 3px 0;
+  line-height: 1.3;
+}
+
+.merch-card .cta-btn {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 6px 12px;
+  background: #007BFF;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.merch-card .cta-btn:hover {
+  background: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 600px) {
+  .merch-card {
+    max-width: 90%;
+  }
+}
