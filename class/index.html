@@ -304,8 +304,8 @@ async function loadUpcomingClasses() {
 );
 
     const snapshot = await getDocs(q);
-    console.log("loadUpcomingClasses snapshot: ", snapshot);
 
+    
     if (snapshot.empty) {
       classesList.innerHTML = "<p>No upcoming classes.</p>";
       return;
@@ -313,8 +313,8 @@ async function loadUpcomingClasses() {
 
     snapshot.forEach((docSnap, index) => {
       const data = docSnap.data();
-      console.log("Classes data: ", data);
 
+      
       // If firstDate is string, convert to Date object for formatting
       const firstDate = data.firstDate ? new Date(data.firstDate) : null;
       const dateStr = firstDate ? firstDate.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "TBD";
@@ -326,9 +326,6 @@ async function loadUpcomingClasses() {
       div.innerHTML = `
         ${data.featured ? '<div class="featured-badge">Featured</div>' : ''}
         <img src="${data.coverImage || ''}" alt="${data.name}" style="width:100%;border-radius:10px;object-fit:cover;height:160px;">
-        <div class="card-overlay">
-          <p>${data.description?.slice(0, 100) || ''}...</p>
-        </div>
         <h3>${data.name}</h3>
         <p>${dateStr} | ${data.time || 'TBD'}</p>
         <p>Price: $${data.singlesCost?.toFixed(2) || 0}</p>
