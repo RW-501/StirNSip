@@ -60,7 +60,7 @@ onSnapshot(collection(db, "gallery"), snapshot => {
     const id = docSnap.id;
 
     // Only show if showOnHome is true OR not defined
-    if (data.showOnHome && data.showOnHome === false) return;
+    if (!data.showOnHome || data.showOnHome === false) return;
 
     const div = document.createElement("div");
     div.classList.add("gallery-item");
